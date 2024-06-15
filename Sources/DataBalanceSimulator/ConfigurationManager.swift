@@ -1,10 +1,13 @@
 import Foundation
 
-enum ConfigsValidationErrors: Error {
+enum ConfigsValidationErrors: Error, Equatable {
     case ConfigFileDoesNotExist(filePath: String)
     case ConfigFileCannotBeOpened(reason: String)
     case ConfigFileCannotBeParsedAsJson(reason: String)
     case ConfigPropertyIsNotInitialized(propertyName: String)
+    case ConfigPropertyTypeIsNotCompliant(
+        propertyName: String, expectedType: String
+    )
 }
 
 protocol SimulatorConfigs {
@@ -33,21 +36,39 @@ class ConfigurationManager: SimulatorConfigs {
     var upperBound: Float
 
     init(simulatorCliConfigs: SimulatorCLIConfigs, configFilePathOpt: String?) throws {
-        let configs: Dictionary<String, Any> = try ConfigurationManager.getConfigsFromFile(
+        var configs: [String: Any] = try ConfigurationManager.getConfigsFromFile(
             configFilePathOpt: configFilePathOpt)
 
-        try ConfigurationManager.updateConfigsWithCLIOptions(configs: &configs, simulatorCliConfigs: simulatorCliConfigs)
-        self.seed = configs["seed"]
-        self.minNodes = configs["minNodes"]
-        self.maxNodes = configs["maxNodes"]
-        self.minServices = configs["minServices"]
-        self.maxServices = configs["maxServices"]
-        self.lowerBound = configs["lowerBound"]
-        self.upperBound = configs["upperBound"]
+        try ConfigurationManager.updateConfigsWithCLIOptions(
+            configs: &configs, simulatorCliConfigs: simulatorCliConfigs
+        )
+        
+        self.seed = try ConfigurationManager.castConfigProp(
+            propType: Int.self, configs: configs, propName: "seed"
+        )
+        self.minNodes = try ConfigurationManager.castConfigProp(
+            propType: Int.self, configs: configs, propName: "minNodes"
+        )
+        self.maxNodes = try ConfigurationManager.castConfigProp(
+            propType: Int.self, configs: configs, propName: "maxNodes"
+        )
+        self.minServices = try ConfigurationManager.castConfigProp(
+            propType: Int.self, configs: configs, propName: "minServices"
+        )
+        self.maxServices = try ConfigurationManager.castConfigProp(
+            propType: Int.self, configs: configs, propName: "maxServices"
+        )
+        self.lowerBound = try ConfigurationManager.castConfigProp(
+            propType: Float.self, configs: configs, propName: "lowerBound"
+        )
+        self.upperBound = try ConfigurationManager.castConfigProp(
+            propType: Float.self, configs: configs, propName: "upperBound"
+        )
     }
 
-    private static func updateConfigsWithCLIOptions(configs: inout Dictionary<String, Any>, 
-        simulatorCliConfigs: SimulatorCLIConfigs) throws {
+    private static func updateConfigsWithCLIOptions(
+        configs: inout [String: Any], simulatorCliConfigs: SimulatorCLIConfigs
+    ) throws {
         configs["seed"] = try mergeValuesForSameConfig(forProp: "seed", 
             values: configs["seed"], simulatorCliConfigs.seed)
         configs["minNodes"] = try mergeValuesForSameConfig(forProp: "minNodes", 
@@ -64,6 +85,16 @@ class ConfigurationManager: SimulatorConfigs {
             values: configs["upperBound"], simulatorCliConfigs.upperBound)
     }
 
+    private static func castConfigProp<T>(
+        propType: T.Type, configs: [String: Any], propName: String
+    ) throws -> T {
+        guard let castProp = configs[propName] as? T else {
+            throw ConfigsValidationErrors.ConfigPropertyTypeIsNotCompliant(
+                propertyName: propName, expectedType: String(describing: propType))
+        }
+        return castProp
+    }
+
     private static func mergeValuesForSameConfig<T>(forProp: String, values: T...) throws -> T {
         if let configValue = values.reversed().compactMap({ $0 }).first {
             return configValue
@@ -74,7 +105,8 @@ class ConfigurationManager: SimulatorConfigs {
     }
 
     private static func getConfigsFromFile(
-        configFilePathOpt: String?) throws -> [String: Any] {
+        configFilePathOpt: String?
+    ) throws -> [String: Any] {
         guard let configFilePath = configFilePathOpt else {
             return [:]
         }
