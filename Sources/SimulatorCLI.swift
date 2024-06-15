@@ -15,18 +15,18 @@ import Foundation
 /**
 The configurations for the simulation run. See parameters in SimulatorOptions
 */
-struct SimulatorConfigs {
-    var seed: Int
-    var minNodes: Int
-    var maxNodes: Int
-    var minServices: Int
-    var maxServices: Int
-    var lowerBound: Float
-    var upperBound: Float
+protocol SimulatorCLIConfigs {
+    var seed: Int? { get set }
+    var minNodes: Int?  { get set }
+    var maxNodes: Int?  { get set }
+    var minServices: Int?  { get set }
+    var maxServices: Int?  { get set }
+    var lowerBound: Float?  { get set }
+    var upperBound: Float?  { get set }
 }
 
 @main
-struct SimulatorCLI: ParsableCommand {
+struct SimulatorCLI: ParsableCommand, SimulatorCLIConfigs {
     @Option(name: .long, help: """
         Seed for sampling. Each service extracts a sample of data; 
         this seed is passed to the service implementation to make the 
@@ -53,18 +53,10 @@ struct SimulatorCLI: ParsableCommand {
     var upperBound: Float?
 
     @Option(name: .long, help: """
-    Configuration file containing the same properties as the CLI in the format
-    ```
-    prop1=1
-    prop2=2
-    ```
-    The CLI options can overwrite this configurations
+    Configuration file containing the same properties as the CLI in the Json format
+    The CLI options can overwrite these configurations
     """)
-    var configFile: String?
-
-    private func mergeConfigsFromOptionsAndFile() -> SimulatorConfigs? {
-        return nil;
-    }
+    var configFilePath: String?
 
     public func run() throws {
         LoggingSystem.bootstrap(StreamLogHandler.standardError)
