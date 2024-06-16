@@ -18,6 +18,7 @@
         "vscode": {
             "extensions": [
                 "pvasek.sourcekit-lsp--dev-unofficial",
+                "sswg.swift-lang",
                 "vadimcn.vscode-lldb",
                 "ms-python.python"
             ],

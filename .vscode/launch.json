@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "sourceLanguages": [
+                "swift"
+            ],
+            "args": [],
+            "cwd": "${workspaceFolder:newrepo}",
+            "name": "Debug DataBalanceSimulator",
+            "program": "${workspaceFolder:newrepo}/.build/debug/DataBalanceSimulator",
+            "preLaunchTask": "swift: Build Debug DataBalanceSimulator"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "sourceLanguages": [
+                "swift"
+            ],
+            "args": [],
+            "cwd": "${workspaceFolder:newrepo}",
+            "name": "Release DataBalanceSimulator",
+            "program": "${workspaceFolder:newrepo}/.build/release/DataBalanceSimulator",
+            "preLaunchTask": "swift: Build Release DataBalanceSimulator"
+        }
+    ]
+}
