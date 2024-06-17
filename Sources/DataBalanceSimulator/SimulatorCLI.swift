@@ -11,22 +11,8 @@ import Foundation
 // let dataframe = pd.read_csv("Input/inmates_enriched_10k.csv")
 // let lib = Python.import("functions")
 
-
-/**
-The configurations for the simulation run. See parameters in SimulatorOptions
-*/
-protocol SimulatorCLIConfigs {
-    var seed: Int? { get set }
-    var minNodes: Int?  { get set }
-    var maxNodes: Int?  { get set }
-    var minServices: Int?  { get set }
-    var maxServices: Int?  { get set }
-    var lowerBound: Float?  { get set }
-    var upperBound: Float?  { get set }
-}
-
 @main
-struct SimulatorCLI: ParsableCommand, SimulatorCLIConfigs {
+struct SimulatorCLI: ParsableCommand {
     @Option(name: .long, help: """
         Seed for sampling. Each service extracts a sample of data; 
         this seed is passed to the service implementation to make the 
@@ -60,7 +46,8 @@ struct SimulatorCLI: ParsableCommand, SimulatorCLIConfigs {
 
     public func run() throws {
         LoggingSystem.bootstrap(StreamLogHandler.standardError)
-        let logger = Logger(label: "SimulatorCLI")
+        let logger = Logger(label: #file.split(separator: ".").dropLast().joined(separator: "."))
+
         // logger.info("""
         // Starting with simulator with:")
         //     ├─ seed=\(self.seed)")
