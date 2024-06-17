@@ -95,8 +95,8 @@ class ConfigurationManager: SimulatorConfigs {
         return castProp
     }
 
-    private static func mergeValuesForSameConfig<T>(forProp: String, values: T...) throws -> T {
-        if let configValue = values.reversed().compactMap({ $0 }).first {
+    private static func mergeValuesForSameConfig<T>(forProp: String, values: T?...) throws -> T {
+        if let configValue = values.compactMap({ $0 }).last {
             return configValue
         } else {
             throw ConfigsValidationErrors.ConfigPropertyIsNotInitialized(
