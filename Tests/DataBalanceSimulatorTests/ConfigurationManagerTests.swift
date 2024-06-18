@@ -12,6 +12,7 @@ public class ConfigurationManagerTests: XCTestCase {
         super.setUp()
 
         self.logger = Logger(label: String(describing: self))
+        self.logger!.logLevel = .debug
         try! FileUtils.createDirIfNotExist(atPath: self.testDir, withFM: self.fileManager)
     }
 
@@ -20,6 +21,64 @@ public class ConfigurationManagerTests: XCTestCase {
 
         super.tearDown()
     }
+
+    func testGivenValidConfigsFromCli_thenOk() throws {
+        let configs = SimulatorConfigsFactory.build()
+
+        let configManager = try ConfigurationManager(
+            simulatorCliConfigs: configs, 
+            configFilePathOpt: nil
+        )
+
+        for prop in ConfigProperties.allCases {
+            XCTAssertEqual(configs[prop]!.description, configManager[prop].description)
+        }
+    }
+
+    func testGivenValidConfigsFromFile_thenOk() throws {
+        let configFilePath = "\(testDir)/valid_config.json"
+        let configs = SimulatorConfigsFactory.build()
+        FileUtils.createConfigFile(
+            withProps: Dictionary(uniqueKeysWithValues: configs.map { ($0.rawValue, $1) }), 
+            atPath: configFilePath,
+            withFM: fileManager)
+
+        let configManager = try ConfigurationManager(
+            simulatorCliConfigs: [:], 
+            configFilePathOpt: configFilePath
+        )
+
+        for prop in ConfigProperties.allCases {
+            XCTAssertEqual(configs[prop]!.description, configManager[prop].description)
+        }
+    }
+
+    func testGivenValidConfigsFromCliAndFile_whenMergeThem_thenCliOverwriteFile() throws {
+        let configFilePath = "\(testDir)/valid_config.json"
+        let fileConfigs = SimulatorConfigsFactory.build()
+        FileUtils.createConfigFile(
+            withProps: Dictionary(uniqueKeysWithValues: fileConfigs.map { ($0.rawValue, $1) }), 
+            atPath: configFilePath,
+            withFM: fileManager)
+        let cliSeed = (fileConfigs[.seed] as! Int) + 1
+        let cliConfigs = [
+            ConfigProperties.seed: cliSeed
+        ]
+
+        let configManager = try ConfigurationManager(
+            simulatorCliConfigs: cliConfigs, 
+            configFilePathOpt: configFilePath
+        )
+
+        for prop in ConfigProperties.allCases {
+            if prop == .seed {
+                XCTAssertEqual(cliSeed, configManager[.seed] as! Int)
+            }
+            else {
+                XCTAssertEqual(fileConfigs[prop]!.description, configManager[prop].description)
+            }
+        }
+    }
     
     // Parameterized tests?
     func testGivenConfigs_whenPropertyIsMissing_thenThrow() throws {
@@ -27,7 +86,7 @@ public class ConfigurationManagerTests: XCTestCase {
             var configs = SimulatorConfigsFactory.build()
             configs[prop] = nil
 
-            self.logger!.info("Testing for property \(prop.rawValue)")
+            TestUtils.logParameterize(forFunction: #function, withInput: prop.rawValue, logger: self.logger!)
             XCTAssertThrowsError(
                 try ConfigurationManager(
                     simulatorCliConfigs: configs, 
@@ -76,7 +135,23 @@ public class ConfigurationManagerTests: XCTestCase {
         )
     }
 
-    func testGivenConfigsFromFile_whenPropertyHasWrongType_thenThrow() throws {
-        
+    func testGivenConfigsFromCli_whenPropertyHasWrongType_thenThrow() throws {
+        for prop in ConfigProperties.allCases {
+            var configs = SimulatorConfigsFactory.build()
+            configs[prop] = "stringTypeIsNotCorrect"
+
+            TestUtils.logParameterize(forFunction: #function, withInput: prop.rawValue, logger: self.logger!)
+            XCTAssertThrowsError(
+                try ConfigurationManager(
+                    simulatorCliConfigs: configs, 
+                    configFilePathOpt: nil
+                ), "type of \(prop.rawValue) is not correct", { error in
+                    XCTAssertEqual(
+                        error as? ConfigsValidationErrors, 
+                        ConfigsValidationErrors.ConfigPropertyTypeIsNotCompliant(property: prop)
+                    )
+                }
+            )
+        }
     }
 }

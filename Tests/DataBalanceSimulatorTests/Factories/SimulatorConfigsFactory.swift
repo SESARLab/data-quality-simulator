@@ -1,7 +1,7 @@
 @testable import DataBalanceSimulator
 
 class SimulatorConfigsFactory {
-    public static func build() -> [ConfigProperties: Any] {
+    public static func build() -> [ConfigProperties: LosslessStringConvertible] {
         return [
             ConfigProperties.seed: 1, 
             ConfigProperties.minNodes: 2,

@@ -19,23 +19,23 @@ enum ConfigProperties: String, CaseIterable {
     case lowerBound
     case upperBound
 
-    func isTypeCompatibleWith(value: Any) -> Bool {
+    func isTypeCompatibleWith(value: LosslessStringConvertible) -> Bool {
         switch self {
-            case .seed: return value is Int
-            case .minNodes: return value is Int
-            case .maxNodes: return value is Int
-            case .minServices: return value is Int
-            case .maxServices: return value is Int
-            case .lowerBound: return value is Float
-            case .upperBound: return value is Float
+            case .seed: return Int("\(value)") != nil
+            case .minNodes: return Int("\(value)") != nil
+            case .maxNodes: return Int("\(value)") != nil
+            case .minServices: return Int("\(value)") != nil
+            case .maxServices: return Int("\(value)") != nil
+            case .lowerBound: return Float("\(value)") != nil
+            case .upperBound: return Float("\(value)") != nil
         }
     }
 }
 
 class ConfigurationManager {
-    var configs: [ConfigProperties: Any]
+    var configs: [ConfigProperties: LosslessStringConvertible]
 
-    init(simulatorCliConfigs: [ConfigProperties: Any], configFilePathOpt: String?) throws {
+    init(simulatorCliConfigs: [ConfigProperties: LosslessStringConvertible], configFilePathOpt: String?) throws {
         self.configs = try ConfigurationManager.getConfigsFromFile(
             configFilePathOpt: configFilePathOpt)
 
@@ -44,9 +44,11 @@ class ConfigurationManager {
         try self.checkTypeOfConfigProperties()
     }
 
-    // func get(property: ConfigProperties) throws -> Any {
-    //     return self.con
-    // }
+    subscript(prop: ConfigProperties) -> LosslessStringConvertible {
+        precondition(configs.count == ConfigProperties.allCases.count)
+        
+        return self.configs[prop]!
+    }
 
     private func checkTypeOfConfigProperties() throws {
         precondition(configs.count == ConfigProperties.allCases.count)
@@ -59,7 +61,7 @@ class ConfigurationManager {
     }
 
     private func mergeConfigsWithCLIOptions(
-        simulatorCliConfigs: [ConfigProperties: Any]
+        simulatorCliConfigs: [ConfigProperties: LosslessStringConvertible]
     ) throws {
         for prop in ConfigProperties.allCases {
             self.configs[prop] = try mergeValuesForSameConfig(
@@ -67,6 +69,8 @@ class ConfigurationManager {
                 values: configs[prop], simulatorCliConfigs[prop]
             )
         }
+
+        assert(self.configs.count == ConfigProperties.allCases.count)
     }
 
     private func mergeValuesForSameConfig<T>(forProp prop: ConfigProperties, values: T?...) throws -> T {
@@ -80,7 +84,7 @@ class ConfigurationManager {
 
     private static func getConfigsFromFile(
         configFilePathOpt: String?
-    ) throws -> [ConfigProperties: Any] {
+    ) throws -> [ConfigProperties: LosslessStringConvertible] {
         guard let configFilePath = configFilePathOpt else {
             return [:]
         }
@@ -109,10 +113,22 @@ class ConfigurationManager {
                 reason: error.localizedDescription)
         }
 
-        var fileConfigs: [ConfigProperties: Any] = [:]
+        var fileConfigs: [ConfigProperties: LosslessStringConvertible] = [:]
         for (propName, value) in rawConfigs {
             if let configPropName = ConfigProperties(rawValue: propName) {
-                fileConfigs[configPropName] = value
+                let castValue: LosslessStringConvertible? = switch configPropName {
+                    case .seed: Int("\(value)")
+                    case .minNodes: Int("\(value)")
+                    case .maxNodes: Int("\(value)")
+                    case .minServices: Int("\(value)")
+                    case .maxServices: Int("\(value)")
+                    case .lowerBound: Float("\(value)")
+                    case .upperBound: Float("\(value)")
+                }
+
+                if castValue != nil {
+                    fileConfigs[configPropName] = castValue
+                }
             }
             else {
                 throw ConfigsValidationErrors.ConfigFileCannotBeParsedCorrectly(

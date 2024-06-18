@@ -23,7 +23,7 @@ public class FileUtils {
     }
 
     public static func createConfigFile(
-        withProps properties: [String: Any], 
+        withProps properties: [String: LosslessStringConvertible], 
         atPath: String, 
         withFM fileManager: FileManager
     ) {
