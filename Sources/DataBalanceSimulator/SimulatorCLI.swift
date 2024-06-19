@@ -32,10 +32,16 @@ struct SimulatorCLI: ParsableCommand {
     @Option(name: .long, help: "Maximum number of services")
     var maxServices: Int?
 
-    @Option(name: .long, help: "Lower bound")
+    @Option(name: .long, help: """
+        Percentage of the minimum amount of data removed after a
+        service execution. Its range is [0, 1]
+        """)
     var lowerBound: Float?
 
-    @Option(name: .long, help: "Upper bound")
+    @Option(name: .long, help: """
+        Percentage of the maximum amount of data removed after a
+        service execution. Its range is [0, 1]
+        """)
     var upperBound: Float?
 
     @Option(name: .long, help: """
@@ -47,18 +53,26 @@ struct SimulatorCLI: ParsableCommand {
     public func run() throws {
         LoggingSystem.bootstrap(StreamLogHandler.standardError)
         let logger = Logger(label: #file.split(separator: ".").dropLast().joined(separator: "."))
-
-        // logger.info("""
-        // Starting with simulator with:")
-        //     ├─ seed=\(self.seed)")
-        //     ├─ minNodes=\(self.minNodes)")
-        //     ├─ maxNodes=\(self.maxNodes)")
-        //     ├─ minServices=\(self.minServices)")
-        //     ├─ maxServices=\(self.maxServices)")
-        //     ├─ minNodes=\(self.minNodes)")
-        //     ├─ lowerBound=\(self.lowerBound)")
-        //     └─ upperBound=\(self.upperBound)")
-        // """)
+        let configManager = try ConfigurationManager(simulatorCliConfigs: [
+            .seed: seed,
+            .minNodes: minNodes,
+            .maxNodes: maxNodes,
+            .minServices: minServices,
+            .maxServices: maxServices,
+            .lowerBound: lowerBound,
+            .upperBound: upperBound
+        ], configFilePathOpt: configFilePath)
+        logger.info("""
+        Starting with simulator with:
+            ├─ seed=\(configManager[.seed])
+            ├─ minNodes=\(configManager[.minNodes])
+            ├─ maxNodes=\(configManager[.maxNodes])
+            ├─ minServices=\(configManager[.minServices])
+            ├─ maxServices=\(configManager[.maxServices])
+            ├─ minNodes=\(configManager[.minNodes])
+            ├─ lowerBound=\(configManager[.lowerBound])
+            └─ upperBound=\(configManager[.upperBound])
+        """)
 
         // let nodesRange = minNodes...maxNodes
         // let servicesRange = minServices...maxServices

@@ -1,0 +1,9 @@
+{
+    "maxServices": 3,
+    "minNodes": 2,
+    "upperBound": 1,
+    "minServices": 2,
+    "maxNodes": 3,
+    "lowerBound": 0.1,
+    "seed": 1
+}

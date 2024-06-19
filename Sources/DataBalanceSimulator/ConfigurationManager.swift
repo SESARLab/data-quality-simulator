@@ -35,7 +35,7 @@ enum ConfigProperties: String, CaseIterable {
 class ConfigurationManager {
     var configs: [ConfigProperties: LosslessStringConvertible]
 
-    init(simulatorCliConfigs: [ConfigProperties: LosslessStringConvertible], configFilePathOpt: String?) throws {
+    init(simulatorCliConfigs: [ConfigProperties: LosslessStringConvertible?], configFilePathOpt: String?) throws {
         self.configs = try ConfigurationManager.getConfigsFromFile(
             configFilePathOpt: configFilePathOpt)
 
@@ -61,12 +61,12 @@ class ConfigurationManager {
     }
 
     private func mergeConfigsWithCLIOptions(
-        simulatorCliConfigs: [ConfigProperties: LosslessStringConvertible]
+        simulatorCliConfigs: [ConfigProperties: LosslessStringConvertible?]
     ) throws {
         for prop in ConfigProperties.allCases {
             self.configs[prop] = try mergeValuesForSameConfig(
                 forProp: prop, 
-                values: configs[prop], simulatorCliConfigs[prop]
+                values: configs[prop], simulatorCliConfigs[prop] ?? nil
             )
         }
 
