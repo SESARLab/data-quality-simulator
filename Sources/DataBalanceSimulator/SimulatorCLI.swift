@@ -2,6 +2,7 @@ import ArgumentParser
 // import PythonKit
 // import Rainbow
 import Logging
+import Algorithms
 import Foundation
 
 // setupPythonEnvironment()
@@ -74,8 +75,8 @@ struct SimulatorCLI: ParsableCommand {
             └─ upperBound=\(configManager[.upperBound])
         """)
 
-        // let nodesRange = minNodes...maxNodes
-        // let servicesRange = minServices...maxServices
+        let nodesRange = (configManager[.minNodes] as! Int)...(configManager[.maxNodes] as! Int)
+        let servicesRange = (configManager[.minServices] as! Int)...(configManager[.maxServices] as! Int)
 
 
         // lib.lowerBound = PythonObject( lowerBound )
@@ -88,31 +89,31 @@ struct SimulatorCLI: ParsableCommand {
         // print("Starting experiment with seed: \(EXPERIMENT_SEED)".yellow)
 
         // for numberOfServices in servicesRange {
-        //   for numberOfNodes in nodesRange {
-        //     let nodes = Array(1...numberOfNodes * numberOfServices)
-        //       .map { Service(id: $0) }
-        //       .chunked(into: numberOfServices)
+        //     for numberOfNodes in nodesRange {
+        //         let nodes = Array(1...numberOfNodes * numberOfServices)
+        //             .map { Service(id: $0) }
+        //             .chunks(ofCount: numberOfServices)
 
-        //     print("Starting with \(numberOfNodes) nodes and \(numberOfServices) services".green)
+        //         print("Starting with \(numberOfNodes) nodes and \(numberOfServices) services".green)
 
-        //     let sim = SimulationWindow(nodes: nodes, dataframe: dataframe)
+        //         let sim = SimulationWindow(nodes: nodes, dataframe: dataframe)
 
-        //     for windowSize in 1...numberOfNodes {
-        //       print("w: \(windowSize): ", terminator: "")
-        //       let result = sim.run(windowSize: windowSize)
-        //       print("m: \(result.metric) | ma: \(result.metric_average) | %: \(result.percentage)")
+        //         for windowSize in 1...numberOfNodes {
+        //         print("w: \(windowSize): ", terminator: "")
+        //         let result = sim.run(windowSize: windowSize)
+        //         print("m: \(result.metric) | ma: \(result.metric_average) | %: \(result.percentage)")
 
-        //       lib.store([
-        //         "metric": result.metric,
-        //         "experiment_id": Double(EXPERIMENT_SEED),
-        //         "window_size": result.window_size,
-        //         "number_of_nodes": Double(numberOfNodes),
-        //         "number_of_services": Double(numberOfServices),
-        //         "percentage": result.percentage,
-        //         "execution_time": result.execution_time,
-        //       ])
+        //         lib.store([
+        //             "metric": result.metric,
+        //             "experiment_id": Double(EXPERIMENT_SEED),
+        //             "window_size": result.window_size,
+        //             "number_of_nodes": Double(numberOfNodes),
+        //             "number_of_services": Double(numberOfServices),
+        //             "percentage": result.percentage,
+        //             "execution_time": result.execution_time,
+        //         ])
+        //         }
         //     }
-        //   }
         // }
     }
 

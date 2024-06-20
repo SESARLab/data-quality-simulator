@@ -9,6 +9,9 @@ RUN <<EOF
     apt-get install -y python3 python3-pip python3-venv python3-mysqldb libmysqlclient-dev
 EOF
 
+RUN --mount=type=bind,source=requirements.txt,target=requirements.txt \ 
+    pip install -r requirements.txt
+
 RUN --mount=type=cache,target=/src/.build \
     --mount=type=bind,source=Package.swift,target=Package.swift \ 
     swift package resolve
