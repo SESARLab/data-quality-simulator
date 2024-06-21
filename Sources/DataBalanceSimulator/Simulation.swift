@@ -10,7 +10,7 @@ class Simulation {
         self.windowSize = windowSize
     }
 
-    public func run(on data: PythonObject) -> Result {
+    public func run(on data: PythonObject) throws -> Result {
         // let windows = nodes.windows(ofCount: windowSize)
         // var previouslyChosenServices: [SimpleService] = []
         // var serviceContext = SimpleContext(previouslyChosenServices: previouslyChosenServices)
@@ -19,6 +19,9 @@ class Simulation {
         //     var currentBest: Simulation.Result?
 
         //     for servicesCombination in Array(window).cartesianProduct() {
+        //         let pipeline = try Pipeline(services: previouslyChosenServices + servicesCombination)
+
+        //         let output = pipeline.run(on: PythonObject)
         //         let possibleBest = sim.run(services: combination)
 
         //         // print("weight:", choosedServices, combination, hash((choosedServices + combination).flatMap { $0.weight }))

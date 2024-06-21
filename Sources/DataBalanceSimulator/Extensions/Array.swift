@@ -11,6 +11,20 @@ extension Array where Element: BinaryFloatingPoint {
     }
 }
 
+extension Array where Element: Equatable {
+    /// Returns whether self is a prefix subarray of `arr`. 
+    /// Example: [1, 2].isPrefix([1, 2, 3]) -> true
+    /// - Parameter arr: the array where the prefix could appear
+    /// - Returns: true if is prefix, false otherwise
+    func isPrefix(of arr: Self) -> Bool {
+        if self.count > arr.count {
+            return false
+        }
+
+        return self.elementsEqual(arr.prefix(self.count))
+    }
+}
+
 extension Array where Element: RandomAccessCollection, Element.Index == Int {
     func cartesianProduct() -> [[Element.Element]] {
         if self.isEmpty || self.count == 1 {

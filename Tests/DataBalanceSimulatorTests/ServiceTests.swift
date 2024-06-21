@@ -3,21 +3,21 @@ import XCTest
 
 public class SimpleServiceTests: XCTestCase {
     func testGivenSimpleServiceAsFirst_whenRun_thenFilterDataset() throws {
-        let s = SimpleServiceFactory.build()
-        let dataset = DatasetFactory.build()
+        let s = SimpleServiceFactory.build(withFilterPercent: 0.5)
+        let dataset = DatasetFactory.build(withDatasetSize: 100)
 
         let filteredDataset = s.run(on: dataset, withContext: SimpleContext(previouslyChosenServices: []))
 
-        DatasetUtils.assertSizeIsSmaller(for: filteredDataset, comparedTo: dataset)
+        DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 50)
     }
 
     func testGivenSimpleServiceAsSecond_whenRun_thenFilterDataset() throws {
-        let s = SimpleServiceFactory.build()
+        let s = SimpleServiceFactory.build(withId: 1, withFilterPercent: 0.5)
         let prevService = SimpleServiceFactory.build(withId: 2)
-        let dataset = DatasetFactory.build()
+        let dataset = DatasetFactory.build(withDatasetSize: 100)
 
         let filteredDataset = s.run(on: dataset, withContext: SimpleContext(previouslyChosenServices: [prevService]))
 
-        DatasetUtils.assertSizeIsSmaller(for: filteredDataset, comparedTo: dataset)
+        DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 50)
     }
 }

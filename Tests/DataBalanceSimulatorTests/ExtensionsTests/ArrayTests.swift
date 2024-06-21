@@ -58,4 +58,49 @@ public class ArrayTests: XCTestCase {
         XCTAssertEqual(result.count, 1)
         XCTAssertEqual(result[0], [1, 2])
     }
+
+    func testGivenArr1DifferentFromArr2Prefix_whenCheckPrefix_thenReturnFalse() throws {
+        let arr1 = [1, 2]
+        let arr2 = [2, 1, 3]
+
+        let result = arr1.isPrefix(of: arr2)
+
+        XCTAssertFalse(result)
+    }
+
+    func testGivenArr1GreaterThanArr2_whenCheckPrefix_thenReturnFalse() throws {
+        let arr1 = [1, 2, 3]
+        let arr2 = [1, 2]
+
+        let result = arr1.isPrefix(of: arr2)
+
+        XCTAssertFalse(result)
+    }
+
+    func testGivenArr1PrefixOfArr2_whenCheckPrefix_thenReturnTrue() throws {
+        let arr1 = [1, 2]
+        let arr2 = [1, 2, 3]
+
+        let result = arr1.isPrefix(of: arr2)
+
+        XCTAssertTrue(result)
+    }
+
+    func testGivenArr1EqualToArr2_whenCheckPrefix_thenReturnTrue() throws {
+        let arr1 = [1, 2]
+        let arr2 = [1, 2]
+
+        let result = arr1.isPrefix(of: arr2)
+
+        XCTAssertTrue(result)
+    }
+
+    func testGivenArr1Empty_whenCheckPrefix_thenReturnTrue() throws {
+        let arr1: [Int] = []
+        let arr2 = [1, 2]
+
+        let result = arr1.isPrefix(of: arr2)
+
+        XCTAssertTrue(result)
+    }
 }
