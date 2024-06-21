@@ -37,13 +37,13 @@ struct SimulatorCLI: ParsableCommand {
         Percentage of the minimum amount of data removed after a
         service execution. Its range is [0, 1]
         """)
-    var lowerBound: Float?
+    var lowerBound: Double?
 
     @Option(name: .long, help: """
         Percentage of the maximum amount of data removed after a
         service execution. Its range is [0, 1]
         """)
-    var upperBound: Float?
+    var upperBound: Double?
 
     @Option(name: .long, help: """
     Configuration file containing the same properties as the CLI in the Json format
@@ -88,20 +88,25 @@ struct SimulatorCLI: ParsableCommand {
 
         // print("Starting experiment with seed: \(EXPERIMENT_SEED)".yellow)
 
-        // for numberOfServices in servicesRange {
-        //     for numberOfNodes in nodesRange {
-        //         let nodes = Array(1...numberOfNodes * numberOfServices)
-        //             .map { Service(id: $0) }
-        //             .chunks(ofCount: numberOfServices)
+        for numberOfServices in servicesRange {
+            for numberOfNodes in nodesRange {
+                let nodes = Array(1...numberOfNodes * numberOfServices)
+                    .map { SimpleService(
+                        id: $0, 
+                        experimentSeed: configManager[.seed] as! Int,
+                        filterLowerBound: configManager[.lowerBound] as! Double, 
+                        filterUpperBound: configManager[.upperBound] as! Double
+                    ) }
+                    .chunks(ofCount: numberOfServices)
 
         //         print("Starting with \(numberOfNodes) nodes and \(numberOfServices) services".green)
 
-        //         let sim = SimulationWindow(nodes: nodes, dataframe: dataframe)
+                // let sim = SimulationWindow(nodes: nodes, dataframe: dataframe)
 
-        //         for windowSize in 1...numberOfNodes {
-        //         print("w: \(windowSize): ", terminator: "")
-        //         let result = sim.run(windowSize: windowSize)
-        //         print("m: \(result.metric) | ma: \(result.metric_average) | %: \(result.percentage)")
+                // for windowSize in 1...numberOfNodes {
+                //     // print("w: \(windowSize): ", terminator: "")
+                //     let result = sim.run(windowSize: windowSize)
+                    // print("m: \(result.metric) | ma: \(result.metric_average) | %: \(result.percentage)")
 
         //         lib.store([
         //             "metric": result.metric,
@@ -112,9 +117,9 @@ struct SimulatorCLI: ParsableCommand {
         //             "percentage": result.percentage,
         //             "execution_time": result.execution_time,
         //         ])
-        //         }
-        //     }
-        // }
+                // }
+            }
+        }
     }
 
 }

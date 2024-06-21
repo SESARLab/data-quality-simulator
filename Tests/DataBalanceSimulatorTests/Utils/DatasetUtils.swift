@@ -8,6 +8,13 @@ public class DatasetUtils {
         for df1: PythonObject, 
         comparedTo df2: PythonObject
     ) {
-        XCTAssert(Int(df1.size)! < Int(df2.size)!)
+        XCTAssertLessThan(Int(df1.size)!, Int(df2.size)!)
+    }
+
+    public static func assertSize(
+        of df: PythonObject,
+        isEqualTo size: Int
+    ) {
+        XCTAssertEqual(Int(df.size)!, size)
     }
 }

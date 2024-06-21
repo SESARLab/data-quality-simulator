@@ -4,7 +4,13 @@ import Foundation
 
 protocol Service: Equatable {
     var id: Int { get }
-    func run(_ dataframe: PythonObject) -> PythonObject
+    func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject
+}
+
+protocol Context {}
+
+struct SimpleContext: Context {
+    var previouslyChosenServices: [SimpleService]
 }
 
 extension Service {
@@ -28,16 +34,6 @@ struct SimpleService: Service, CustomStringConvertible {
         return "S" + String(format: "%02d", id)
     }
 
-    var previouslyChosenServices: [Self] = []
-    var finalFilteringPercent: Double {
-        precondition(!previouslyChosenServices.isEmpty)
-        
-        let servicesLineageSeed = self.previouslyChosenServices.flatMap { $0.filteringSeed.bytes } +
-            self.filteringSeed.bytes
-
-        return generatePercent(usingHashFrom: servicesLineageSeed)
-    }
-
     init(id: Int, 
         filteringSeed: Double? = nil, 
         experimentSeed: Int,
@@ -54,12 +50,24 @@ struct SimpleService: Service, CustomStringConvertible {
     /// Run the service and filter using the percent computed by finalFilteringPercent
     /// - Parameters:
     ///   - dataframe: Pandas dataframe containing the dataset
-    /// - Returns: the filtered dataframe
-    func run(_ dataframe: PythonObject) -> PythonObject {
+    ///   - context: the execution context, which includes the previously executed services
+    /// - Returns: the filtered dataframe and the filtering percent applied
+    func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject {
+        precondition(context is SimpleContext, "A SimpleService requires a SimpleContext when it runs")
+
+        let ctx = context as! SimpleContext
+
         return dataframe.sample(
-            frac: self.finalFilteringPercent,
+            frac: self.finalFilteringPercent(from: ctx),
             random_state: self.experimentSeed
         )
+    }
+
+    private func finalFilteringPercent(from context: SimpleContext) -> Double {
+        let servicesLineageSeed = context.previouslyChosenServices.flatMap { $0.filteringSeed.bytes } +
+            self.filteringSeed.bytes
+
+        return generatePercent(usingHashFrom: servicesLineageSeed)
     }
 
     private func generatePercent(usingHashFrom x: [UInt8]) -> Double {

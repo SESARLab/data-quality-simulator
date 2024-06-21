@@ -26,8 +26,8 @@ enum ConfigProperties: String, CaseIterable {
             case .maxNodes: return Int("\(value)") != nil
             case .minServices: return Int("\(value)") != nil
             case .maxServices: return Int("\(value)") != nil
-            case .lowerBound: return Float("\(value)") != nil
-            case .upperBound: return Float("\(value)") != nil
+            case .lowerBound: return Double("\(value)") != nil
+            case .upperBound: return Double("\(value)") != nil
         }
     }
 }
@@ -122,8 +122,8 @@ class ConfigurationManager {
                     case .maxNodes: Int("\(value)")
                     case .minServices: Int("\(value)")
                     case .maxServices: Int("\(value)")
-                    case .lowerBound: Float("\(value)")
-                    case .upperBound: Float("\(value)")
+                    case .lowerBound: Double("\(value)")
+                    case .upperBound: Double("\(value)")
                 }
 
                 if castValue != nil {

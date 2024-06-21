@@ -1,3 +1,3 @@
 enum GenericErrors: Error, Equatable {
-    case InvalidOperation(String)
+    case InvalidState(String)
 }
