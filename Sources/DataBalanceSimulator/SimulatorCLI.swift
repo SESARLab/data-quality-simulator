@@ -3,9 +3,6 @@ import ArgumentParser
 import Logging
 import Algorithms
 import Foundation
-import PythonKit
-
-// setupPythonEnvironment()
 
 // let pd = Python.import("pandas")
 // let np = Python.import("numpy")
@@ -127,11 +124,4 @@ struct SimulatorCLI: ParsableCommand {
             }
         }
     }
-
-    private func initPythonEnv() {
-        let os = Python.import("os")
-        let sys = Python.import("sys")
-        sys.path.append("\(os.getcwd())")
-    }
-
 }

@@ -23,7 +23,6 @@ public class PipelineTests: XCTestCase {
         let result = pipeline.run(on: dataset)
 
         DatasetUtils.assertSize(of: result.output, isEqualTo: 50)
-        XCTAssertEqual(result.metricCalculator.filteredPercent, 0.5)
     }
 
     func testGivenPipelineWithMultipleServices_whenRun_thenExecuteSequentially() throws {
@@ -35,7 +34,6 @@ public class PipelineTests: XCTestCase {
         let result = pipeline.run(on: dataset)
 
         DatasetUtils.assertSize(of: result.output, isEqualTo: 25)
-        XCTAssertEqual(result.metricCalculator.filteredPercent, 0.25)
     }
 
     func testGivenPipelineWithCacheEmpty_whenRun_thenExecuteAllServices() throws {
@@ -47,7 +45,6 @@ public class PipelineTests: XCTestCase {
         let result = pipeline.run(on: dataset, withCache: [])
 
         DatasetUtils.assertSize(of: result.output, isEqualTo: 25)
-        XCTAssertEqual(result.metricCalculator.filteredPercent, 0.25)
     }
 
     func testGivenPipelineWithCacheMiss_whenRun_thenExecuteAllServices() throws {
@@ -61,7 +58,6 @@ public class PipelineTests: XCTestCase {
         let result = pipeline.run(on: dataset, withCache: [([s3], dumbDataset)])
 
         DatasetUtils.assertSize(of: result.output, isEqualTo: 25)
-        XCTAssertEqual(result.metricCalculator.filteredPercent, 0.25)
     }
 
     func testGivenPipelineWithCacheHit_whenRun_thenExecuteRemainingServices() throws {
@@ -86,5 +82,17 @@ public class PipelineTests: XCTestCase {
         let result = pipeline.run(on: dataset, withCache: [([s1, s2], cachedDataset)])
 
         DatasetUtils.assertSize(of: result.output, isEqualTo: 10)
+    }
+
+    func testGivenPipelineWithQuantitativeMetric_whenRun_thenReturnStats() throws {
+        let s1 = SimpleServiceFactory.build(withId: 1, withFilterPercent: 0.5)
+        let s2 = SimpleServiceFactory.build(withId: 2, withFilterPercent: 0.5)
+        let dataset = DatasetFactory.build(withDatasetSize: 100)
+        let pipeline = try PipelineFactory.build(withServices: [s1, s2])
+
+        let result = pipeline.run(on: dataset)
+
+        XCTAssertEqual(result.statsCalculator.filteredPercent, 0.25)
+        XCTAssertEqual(result.statsCalculator.metricValue, 0.25)
     }
 }

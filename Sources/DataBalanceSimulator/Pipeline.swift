@@ -16,7 +16,7 @@ class Pipeline {
     public func run(
         on dataset: PythonObject, 
         withCache cache: [([SimpleService], PythonObject)]? = nil
-    ) -> (output: PythonObject, metricCalculator: MetricCalculator) {
+    ) -> (output: PythonObject, statsCalculator: StatsCalculator) {
         let startingDataset: PythonObject
         var previouslyChosenServices: [SimpleService]
         let pipelineServices: [SimpleService]
@@ -50,7 +50,7 @@ class Pipeline {
 
         return (
             output: output, 
-            metricCalculator: try! MetricCalculator(
+            statsCalculator: try! StatsCalculator(
                 originalDataset: dataset,
                 filteredDataset: output,
                 pipeline: self,

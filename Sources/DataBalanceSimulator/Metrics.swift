@@ -13,7 +13,7 @@ enum MetricNames: String, CaseIterable, LosslessStringConvertible {
     }
 }
 
-struct MetricCalculator {
+struct StatsCalculator {
     let originalDataset: PythonObject
 
     let filteredDataset: PythonObject
@@ -24,7 +24,7 @@ struct MetricCalculator {
 
     let filteredPercent: Double
 
-    let metric: Double = 0.0
+    let metricValue: Double
 
     init(
         originalDataset: PythonObject, 
@@ -53,5 +53,11 @@ struct MetricCalculator {
 
             return newPercent
         })
+
+        let metricCalculator = PythonModulesStore.getAttr(
+            module: PythonModulesStore.metrics, 
+            attr: metricName.rawValue
+        )
+        self.metricValue = Double(metricCalculator(df1: originalDataset, df2: filteredDataset))!
     }
 }
