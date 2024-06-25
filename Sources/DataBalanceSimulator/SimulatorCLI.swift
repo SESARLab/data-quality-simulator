@@ -1,9 +1,9 @@
 import ArgumentParser
-// import PythonKit
 // import Rainbow
 import Logging
 import Algorithms
 import Foundation
+import PythonKit
 
 // setupPythonEnvironment()
 
@@ -46,6 +46,11 @@ struct SimulatorCLI: ParsableCommand {
     var upperBound: Double?
 
     @Option(name: .long, help: """
+        The metric used to evaluate the best combination of services in the pipeline
+        """)
+    var metricName: String?
+
+    @Option(name: .long, help: """
     Configuration file containing the same properties as the CLI in the Json format
     The CLI options can overwrite these configurations
     """)
@@ -61,7 +66,8 @@ struct SimulatorCLI: ParsableCommand {
             .minServices: minServices,
             .maxServices: maxServices,
             .lowerBound: lowerBound,
-            .upperBound: upperBound
+            .upperBound: upperBound,
+            .metricName: metricName
         ], configFilePathOpt: configFilePath)
         logger.info("""
         Starting with simulator with:
@@ -120,6 +126,12 @@ struct SimulatorCLI: ParsableCommand {
                 // }
             }
         }
+    }
+
+    private func initPythonEnv() {
+        let os = Python.import("os")
+        let sys = Python.import("sys")
+        sys.path.append("\(os.getcwd())")
     }
 
 }

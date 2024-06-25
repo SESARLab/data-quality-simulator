@@ -6,7 +6,10 @@ public class SimpleServiceTests: XCTestCase {
         let s = SimpleServiceFactory.build(withFilterPercent: 0.5)
         let dataset = DatasetFactory.build(withDatasetSize: 100)
 
-        let filteredDataset = s.run(on: dataset, withContext: SimpleContext(previouslyChosenServices: []))
+        let filteredDataset = s.run(on: dataset, withContext: SimpleContext(
+            previouslyChosenServices: [],
+            accumulatedFilteringSeed: []
+        ))
 
         DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 50)
     }
@@ -16,7 +19,10 @@ public class SimpleServiceTests: XCTestCase {
         let prevService = SimpleServiceFactory.build(withId: 2)
         let dataset = DatasetFactory.build(withDatasetSize: 100)
 
-        let filteredDataset = s.run(on: dataset, withContext: SimpleContext(previouslyChosenServices: [prevService]))
+        let filteredDataset = s.run(on: dataset, withContext: SimpleContext(
+            previouslyChosenServices: [prevService],
+            accumulatedFilteringSeed: prevService.filteringSeed
+        ))
 
         DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 50)
     }

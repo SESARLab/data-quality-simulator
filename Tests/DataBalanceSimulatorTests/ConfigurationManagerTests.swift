@@ -138,7 +138,7 @@ public class ConfigurationManagerTests: XCTestCase {
     func testGivenConfigsFromCli_whenPropertyHasWrongType_thenThrow() throws {
         for prop in ConfigProperties.allCases {
             var configs = SimulatorConfigsFactory.build()
-            configs[prop] = "stringTypeIsNotCorrect"
+            configs[prop] = "ThisTypeIsNotCorrect"
 
             TestUtils.logParameterize(forFunction: #function, withInput: prop.rawValue, logger: self.logger!)
             XCTAssertThrowsError(

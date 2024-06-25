@@ -1,5 +1,7 @@
 import Foundation
 
+@testable import DataBalanceSimulator
+
 public class FileUtils {
     public static func createDirIfNotExist(atPath: String, withFM fileManager: FileManager) throws {
         var isDirectory: ObjCBool = false
@@ -27,8 +29,10 @@ public class FileUtils {
         atPath: String, 
         withFM fileManager: FileManager
     ) {
+        var codableProperties = properties
+        codableProperties["metricName"] = String(codableProperties["metricName"] as! MetricNames)
         let jsonContent = try! JSONSerialization.data(
-            withJSONObject: properties, options: []
+            withJSONObject: codableProperties, options: []
         )
 
         fileManager.createFile(atPath: atPath, contents: jsonContent)

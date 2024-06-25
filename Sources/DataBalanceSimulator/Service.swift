@@ -11,6 +11,7 @@ protocol Context {}
 
 struct SimpleContext: Context {
     var previouslyChosenServices: [SimpleService]
+    var accumulatedFilteringSeed: [UInt8]
 }
 
 extension Service {
@@ -24,7 +25,7 @@ struct SimpleService: Service, CustomStringConvertible {
 
     let experimentSeed: Int
 
-    let filteringSeed: Double
+    let filteringSeed: [UInt8]
 
     let filterLowerBound: Double
 
@@ -41,7 +42,7 @@ struct SimpleService: Service, CustomStringConvertible {
         filterUpperBound: Double
     ) {
         self.id = id
-        self.filteringSeed = filteringSeed ?? Double.random(in: 0...1)
+        self.filteringSeed = (filteringSeed ?? Double.random(in: 0...1)).bytes
         self.experimentSeed = experimentSeed
         self.filterLowerBound = filterLowerBound
         self.filterUpperBound = filterUpperBound
@@ -52,7 +53,7 @@ struct SimpleService: Service, CustomStringConvertible {
     ///   - dataframe: Pandas dataframe containing the dataset
     ///   - context: the execution context, which includes the previously executed services
     /// - Returns: the filtered dataframe and the filtering percent applied
-    func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject {
+    public func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject {
         precondition(context is SimpleContext, "A SimpleService requires a SimpleContext when it runs")
 
         let ctx = context as! SimpleContext
@@ -63,9 +64,8 @@ struct SimpleService: Service, CustomStringConvertible {
         )
     }
 
-    private func finalFilteringPercent(from context: SimpleContext) -> Double {
-        let servicesLineageSeed = context.previouslyChosenServices.flatMap { $0.filteringSeed.bytes } +
-            self.filteringSeed.bytes
+    public func finalFilteringPercent(from context: SimpleContext) -> Double {
+        let servicesLineageSeed = context.accumulatedFilteringSeed + self.filteringSeed
 
         return generatePercent(usingHashFrom: servicesLineageSeed)
     }

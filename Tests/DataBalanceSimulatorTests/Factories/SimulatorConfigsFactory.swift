@@ -9,7 +9,8 @@ class SimulatorConfigsFactory {
             ConfigProperties.minServices: 2, 
             ConfigProperties.maxServices: 3, 
             ConfigProperties.lowerBound: 0.1, 
-            ConfigProperties.upperBound: 1.0
+            ConfigProperties.upperBound: 1.0,
+            ConfigProperties.metricName: MetricNames.qualitative
         ]
     }
 }

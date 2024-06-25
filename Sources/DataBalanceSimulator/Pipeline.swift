@@ -3,41 +3,64 @@ import PythonKit
 class Pipeline {
     let services: [SimpleService]
 
-    init(services: [SimpleService]) throws {
+    let metricName: MetricNames
+
+    init(services: [SimpleService], metricName: MetricNames) throws {
         guard !services.isEmpty else {
             throw GenericErrors.InvalidState("Pipeline cannot run with 0 services")
         }
         self.services = services
+        self.metricName = metricName
     }
 
-    public func run(on dataset: PythonObject, withCache cache: [([SimpleService], PythonObject)]? = nil) -> PythonObject {
+    public func run(
+        on dataset: PythonObject, 
+        withCache cache: [([SimpleService], PythonObject)]? = nil
+    ) -> (output: PythonObject, metricCalculator: MetricCalculator) {
         let startingDataset: PythonObject
         var previouslyChosenServices: [SimpleService]
         let pipelineServices: [SimpleService]
-        if let cacheHit = searchForBestCacheHit(cache: cache) {
+        var accumulatedFilteringSeed: [UInt8]
+        if let cacheHit = searchForBestCacheHit(on: cache) {
             startingDataset = cacheHit.1
             previouslyChosenServices = cacheHit.0
             pipelineServices = Array(services[cacheHit.0.count...])
+            accumulatedFilteringSeed = previouslyChosenServices.flatMap { $0.filteringSeed }
         }
         else {
             startingDataset = dataset
             previouslyChosenServices = []
             pipelineServices = services
+            accumulatedFilteringSeed = []
         }
 
-        return pipelineServices.reduce(startingDataset, { (res: PythonObject, current: SimpleService) -> PythonObject in
+        let output = pipelineServices.reduce(startingDataset, { (res: PythonObject, current: SimpleService) -> PythonObject in
             let result = current.run(
                 on: res,
-                withContext: SimpleContext(previouslyChosenServices: previouslyChosenServices)
+                withContext: SimpleContext(
+                    previouslyChosenServices: previouslyChosenServices,
+                    accumulatedFilteringSeed: accumulatedFilteringSeed
+                )
             )
             previouslyChosenServices.append(current)
+            accumulatedFilteringSeed += current.filteringSeed
 
             return result
         })
+
+        return (
+            output: output, 
+            metricCalculator: try! MetricCalculator(
+                originalDataset: dataset,
+                filteredDataset: output,
+                pipeline: self,
+                metricName: metricName
+            )
+        )
     }
 
     private func searchForBestCacheHit(
-        cache: [([SimpleService], PythonObject)]?
+        on cache: [([SimpleService], PythonObject)]?
     ) -> ([SimpleService], PythonObject)? {
         var bestHit: ([SimpleService], PythonObject)? = nil
 
