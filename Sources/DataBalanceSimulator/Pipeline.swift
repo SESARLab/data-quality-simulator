@@ -3,9 +3,9 @@ import PythonKit
 class Pipeline {
     let services: [SimpleService]
 
-    let metricName: MetricNames
+    let metricName: String
 
-    init(services: [SimpleService], metricName: MetricNames) throws {
+    init(services: [SimpleService], metricName: String) throws {
         guard !services.isEmpty else {
             throw GenericErrors.InvalidState("Pipeline cannot run with 0 services")
         }

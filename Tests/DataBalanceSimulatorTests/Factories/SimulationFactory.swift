@@ -6,7 +6,7 @@ class SimulationFactory {
         withWindowSize winSize: Int
     ) throws -> Simulation {
         return try Simulation(
-            nodes: nodes, windowSize: winSize, metricName: MetricNames.quantitative
+            nodes: nodes, windowSize: winSize, metricName: "quantitative"
         )
     }
 }

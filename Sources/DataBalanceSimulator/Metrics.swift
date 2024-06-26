@@ -1,18 +1,5 @@
 import PythonKit
 
-enum MetricNames: String, CaseIterable, LosslessStringConvertible {
-    case qualitative
-    case quantitative
-
-    init?(_ description: String) {
-        self.init(rawValue: description)
-    }
-
-    var description: String {
-        return self.rawValue
-    }
-}
-
 struct StatsCalculator {
     let originalDataset: PythonObject
 
@@ -20,7 +7,7 @@ struct StatsCalculator {
 
     let pipeline: Pipeline
 
-    let metricName: MetricNames
+    let metricName: String
 
     let filteredPercent: Double
 
@@ -30,7 +17,7 @@ struct StatsCalculator {
         originalDataset: PythonObject, 
         filteredDataset: PythonObject,
         pipeline: Pipeline,
-        metricName: MetricNames
+        metricName: String
     ) throws {
         guard !pipeline.services.isEmpty else {
             throw GenericErrors.InvalidState("Pipeline cannot run with 0 services")
@@ -56,7 +43,7 @@ struct StatsCalculator {
 
         let metricCalculator = PythonModulesStore.getAttr(
             module: PythonModulesStore.metrics, 
-            attr: metricName.rawValue
+            attr: metricName
         )
         self.metricValue = Double(metricCalculator(df1: originalDataset, df2: filteredDataset))!
     }

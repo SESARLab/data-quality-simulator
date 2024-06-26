@@ -29,10 +29,8 @@ public class FileUtils {
         atPath: String, 
         withFM fileManager: FileManager
     ) {
-        var codableProperties = properties
-        codableProperties["metricName"] = String(codableProperties["metricName"] as! MetricNames)
         let jsonContent = try! JSONSerialization.data(
-            withJSONObject: codableProperties, options: []
+            withJSONObject: properties, options: []
         )
 
         fileManager.createFile(atPath: atPath, contents: jsonContent)

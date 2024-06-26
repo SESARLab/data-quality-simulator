@@ -135,10 +135,18 @@ public class ConfigurationManagerTests: XCTestCase {
         )
     }
 
+    struct NotExistingType: LosslessStringConvertible {
+        init?(_ description: String) {
+            self.description = description
+        }
+
+        var description: String
+    }
+    
     func testGivenConfigsFromCli_whenPropertyHasWrongType_thenThrow() throws {
         for prop in ConfigProperties.allCases {
             var configs = SimulatorConfigsFactory.build()
-            configs[prop] = "ThisTypeIsNotCorrect"
+            configs[prop] = NotExistingType("does-not-exist")
 
             TestUtils.logParameterize(forFunction: #function, withInput: prop.rawValue, logger: self.logger!)
             XCTAssertThrowsError(

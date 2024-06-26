@@ -4,11 +4,6 @@ import Logging
 import Algorithms
 import Foundation
 
-// let pd = Python.import("pandas")
-// let np = Python.import("numpy")
-// let dataframe = pd.read_csv("Input/inmates_enriched_10k.csv")
-// let lib = Python.import("functions")
-
 @main
 struct SimulatorCLI: ParsableCommand {
     @Option(name: .long, help: """
@@ -48,6 +43,12 @@ struct SimulatorCLI: ParsableCommand {
     var metricName: String?
 
     @Option(name: .long, help: """
+        The dataset loaded for the experiment. Available values are the function
+        names in the `dataset.py` file
+        """)
+    var datasetName: String?
+
+    @Option(name: .long, help: """
     Configuration file containing the same properties as the CLI in the Json format
     The CLI options can overwrite these configurations
     """)
@@ -55,7 +56,7 @@ struct SimulatorCLI: ParsableCommand {
 
     public func run() throws {
         LoggingSystem.bootstrap(StreamLogHandler.standardError)
-        let logger = Logger(label: #file.split(separator: ".").dropLast().joined(separator: "."))
+        let logger = Logger(label: #file.getFileName())
         let configManager = try ConfigurationManager(simulatorCliConfigs: [
             .seed: seed,
             .minNodes: minNodes,
@@ -64,7 +65,8 @@ struct SimulatorCLI: ParsableCommand {
             .maxServices: maxServices,
             .lowerBound: lowerBound,
             .upperBound: upperBound,
-            .metricName: metricName
+            .metricName: metricName,
+            .datasetName: datasetName
         ], configFilePathOpt: configFilePath)
         logger.info("""
         Starting with simulator with:
@@ -75,21 +77,17 @@ struct SimulatorCLI: ParsableCommand {
             ├─ maxServices=\(configManager[.maxServices])
             ├─ minNodes=\(configManager[.minNodes])
             ├─ lowerBound=\(configManager[.lowerBound])
-            └─ upperBound=\(configManager[.upperBound])
+            ├─ upperBound=\(configManager[.upperBound])
+            ├─ metricName=\(configManager[.metricName])
+            └─ datasetName=\(configManager[.datasetName])
         """)
 
         let nodesRange = (configManager[.minNodes] as! Int)...(configManager[.maxNodes] as! Int)
         let servicesRange = (configManager[.minServices] as! Int)...(configManager[.maxServices] as! Int)
-
-
-        // lib.lowerBound = PythonObject( lowerBound )
-        // lib.upperBound = PythonObject( upperBound )
-        // lib.number_of_nodes = PythonObject( numberOfNodes )
-        // lib.number_of_services = PythonObject( numberOfServices )
-
-        // EXPERIMENT_SEED = experimentRange
-
-        // print("Starting experiment with seed: \(EXPERIMENT_SEED)".yellow)
+        let dataset = PythonModulesStore.getAttr(
+            module: PythonModulesStore.dataset, 
+            attr: configManager[.datasetName] as! String
+        )()
 
         for numberOfServices in servicesRange {
             for numberOfNodes in nodesRange {
@@ -100,17 +98,16 @@ struct SimulatorCLI: ParsableCommand {
                         filterLowerBound: configManager[.lowerBound] as! Double, 
                         filterUpperBound: configManager[.upperBound] as! Double
                     ) }
-                    .chunks(ofCount: numberOfServices)
+                    .chunks(ofCount: numberOfServices).map { Array($0) }
 
-        //         print("Starting with \(numberOfNodes) nodes and \(numberOfServices) services".green)
+                for windowSize in 1...numberOfNodes {
+                    let sim = try Simulation(
+                        nodes: nodes, 
+                        windowSize: windowSize, 
+                        metricName: configManager[.metricName] as! String
+                    )
 
-                // let sim = SimulationWindow(nodes: nodes, dataframe: dataframe)
-
-                // for windowSize in 1...numberOfNodes {
-                //     // print("w: \(windowSize): ", terminator: "")
-                //     let result = sim.run(windowSize: windowSize)
-                    // print("m: \(result.metric) | ma: \(result.metric_average) | %: \(result.percentage)")
-
+                    try sim.run(on: dataset)
         //         lib.store([
         //             "metric": result.metric,
         //             "experiment_id": Double(EXPERIMENT_SEED),
@@ -120,7 +117,7 @@ struct SimulatorCLI: ParsableCommand {
         //             "percentage": result.percentage,
         //             "execution_time": result.execution_time,
         //         ])
-                // }
+                }
             }
         }
     }

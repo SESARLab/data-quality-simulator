@@ -2,6 +2,6 @@
 
 class PipelineFactory {
     public static func build(withServices services: [SimpleService]) throws -> Pipeline {
-        return try Pipeline(services: services, metricName: MetricNames.quantitative)
+        return try Pipeline(services: services, metricName: "quantitative")
     }
 }

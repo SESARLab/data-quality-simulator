@@ -1,17 +1,20 @@
 import PythonKit
 import Foundation
+import Logging
 
 class Simulation {
     let nodes: [[SimpleService]]
 
     let windowSize: Int
 
-    let metricName: MetricNames
+    let metricName: String
+
+    let logger: Logger
 
     init(
         nodes: [[SimpleService]],
         windowSize: Int,
-        metricName: MetricNames
+        metricName: String
     ) throws {
         guard nodes.count >= windowSize else {
             throw GenericErrors.InvalidState("windowSize must be smaller than the number of nodes")
@@ -20,20 +23,36 @@ class Simulation {
         self.nodes = nodes
         self.windowSize = windowSize
         self.metricName = metricName
+        self.logger = Logger(label: #file.getFileName())
     }
 
     public func run(on data: PythonObject) throws -> Result {
+        logger.info("""
+        Starting simulation with:
+            ├─ windowSize: \(windowSize)
+            ├─ nodeCount: \(nodes.count)
+            └─ nodes: \(nodes)
+        """)
+
         let startTime = DispatchTime.now()
         let result = try internalRun(on: data)
         let endTime = DispatchTime.now()
 
         let elapsedTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
         
-        return Result(
+        let simulationResult = Result(
             metric: result.metricValue, 
             percentage: result.filteredPercent, 
             execution_time: Double(elapsedTime) / 1_000_000_000
         )
+
+        logger.info("""
+        Simulation results:
+            ├─ metric: \(simulationResult.metric)
+            ├─ percentage: \(simulationResult.percentage)
+            └─ execution_time: \(simulationResult.execution_time)
+        """)
+        return simulationResult
     }
 
     private func internalRun(on data: PythonObject) throws -> StatsCalculator {

@@ -19,6 +19,7 @@ enum ConfigProperties: String, CaseIterable {
     case lowerBound
     case upperBound
     case metricName
+    case datasetName
 
     func isTypeCompatibleWith(value: LosslessStringConvertible) -> Bool {
         switch self {
@@ -29,7 +30,8 @@ enum ConfigProperties: String, CaseIterable {
             case .maxServices: return Int("\(value)") != nil
             case .lowerBound: return Double("\(value)") != nil
             case .upperBound: return Double("\(value)") != nil
-            case .metricName: return MetricNames("\(value)") != nil
+            case .metricName: return value is String
+            case .datasetName: return value is String
         }
     }
 }
@@ -126,7 +128,8 @@ class ConfigurationManager {
                     case .maxServices: Int("\(value)")
                     case .lowerBound: Double("\(value)")
                     case .upperBound: Double("\(value)")
-                    case .metricName: MetricNames("\(value)")
+                    case .metricName: String(describing: value)
+                    case .datasetName: String(describing: value)
                 }
 
                 if castValue != nil {

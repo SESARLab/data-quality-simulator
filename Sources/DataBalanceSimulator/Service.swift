@@ -2,7 +2,7 @@ import CryptoSwift
 import PythonKit
 import Foundation
 
-protocol Service: Equatable {
+protocol Service: Equatable, CustomStringConvertible {
     var id: Int { get }
     func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject
 }
@@ -20,7 +20,7 @@ extension Service {
     }
 }
 
-struct SimpleService: Service, CustomStringConvertible {
+struct SimpleService: Service {
     var id: Int
 
     let experimentSeed: Int
@@ -32,7 +32,7 @@ struct SimpleService: Service, CustomStringConvertible {
     let filterUpperBound: Double
 
     var description: String {
-        return "S" + String(format: "%02d", id)
+        return "SS" + String(format: "%02d", id)
     }
 
     init(id: Int, 
