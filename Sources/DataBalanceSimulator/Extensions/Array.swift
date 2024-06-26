@@ -27,9 +27,9 @@ extension Array where Element: Equatable {
 
 extension Array where Element: RandomAccessCollection, Element.Index == Int {
     func cartesianProduct() -> [[Element.Element]] {
-        if self.isEmpty || self.count == 1 {
+        if self.isEmpty {
             // type mismatch if returns self
-            return self.map { $0.map { $0 } }
+            return []
         }
 
         // Algorithms does not provide a `product` with ariety > 2, so

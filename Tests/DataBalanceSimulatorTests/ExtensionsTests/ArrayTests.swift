@@ -55,8 +55,9 @@ public class ArrayTests: XCTestCase {
 
         let result = matrix.cartesianProduct()
 
-        XCTAssertEqual(result.count, 1)
-        XCTAssertEqual(result[0], [1, 2])
+        XCTAssertEqual(result.count, 2)
+        XCTAssert(result.firstIndex(of: [1]) != nil)
+        XCTAssert(result.firstIndex(of: [2]) != nil)
     }
 
     func testGivenArr1DifferentFromArr2Prefix_whenCheckPrefix_thenReturnFalse() throws {

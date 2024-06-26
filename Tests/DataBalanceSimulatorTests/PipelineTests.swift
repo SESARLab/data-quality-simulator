@@ -2,7 +2,7 @@ import XCTest
 @testable import DataBalanceSimulator
 
 public class PipelineTests: XCTestCase {
-    func testGivenPipelineWith0Services_whenRun_thenThrow() throws {
+    func testGivenPipelineWith0Services_whenCreated_thenThrow() throws {
         XCTAssertThrowsError(
             try PipelineFactory.build(withServices: []),
             "Pipeline cannot run with 0 services", 

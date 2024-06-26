@@ -12,4 +12,15 @@ class SimpleServiceFactory {
             filterUpperBound: upperBound
         )
     }
+
+    public static func buildGroups(withFilterPercents filterPercents: [Double]...) -> [[SimpleService]] {
+        return Array(0..<filterPercents.count).map { groupIndex in
+            Array(0..<filterPercents[groupIndex].count).map { elemIndex in
+                SimpleServiceFactory.build(
+                    withId: groupIndex * elemIndex, 
+                    withFilterPercent: filterPercents[groupIndex][elemIndex]
+                )
+            }
+        }
+    }
 }
