@@ -5,5 +5,7 @@
     "minServices": 2,
     "maxNodes": 3,
     "lowerBound": 0.1,
-    "seed": 1
+    "seed": 1,
+    "metricName": "qualitative",
+    "datasetName": "inmates_enriched_10k"
 }

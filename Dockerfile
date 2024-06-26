@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1
+
 ARG SWIFT_VERSION=5.10.1
 FROM swift:${SWIFT_VERSION} AS base
 
@@ -26,8 +27,21 @@ FROM base AS build
 
 RUN --mount=type=cache,target=/src/.build \
     --mount=type=bind,source=.,target=. \ 
-    swift build
+    swift build --configuration release
 
 
+FROM build AS test
+
+RUN --mount=type=cache,target=/src/.build \
+    --mount=type=bind,source=.,target=. \ 
+    swift test
 
 
+FROM swift:${SWIFT_VERSION}-slim AS data-quality-simulator
+
+COPY --from=build /src/.build/release/DataBalanceSimulator /DataBalanceSimulator
+COPY ./config-files /config-files
+
+ENTRYPOINT ["/DataBalanceSimulator"]
+
+CMD ["--config-file-path", "/config-files/basic.json"]

@@ -1,2 +1,9 @@
 Makefile
 Input/
+.build/
+README.md
+config-files/
+.vscode/
+.github/
+.devcontainer/
+__pycache__/

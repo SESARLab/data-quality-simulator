@@ -25,7 +25,7 @@ class PythonModulesStore {
     public static func configurePythonEnv() {
         let os = Python.import("os")
         let sys = Python.import("sys")
-        sys.path.append("\(os.getcwd())")
+        sys.path.append("\(os.getcwd())/python-modules")
     }
 
     public static func getAttr(module: PythonObject, attr: String) -> PythonObject {
