@@ -25,7 +25,11 @@ run:
 ifdef IS_DEVCONTAINER
 	/DataBalanceSimulator --config-file-path=$(CONFIG_FILE_PATH)
 else
-	docker build --target data-quality-simulator .
-	docker run --rm data-quality-simulator --config-file-path=$(CONFIG_FILE_PATH)
+	docker build --target data-quality-simulator -t data-quality-simulator:latest .
+	docker run --rm \
+		-v "./config-files:/app/config-files" \
+		-v "./datasets:/app/datasets" \
+		data-quality-simulator \
+		# --config-file-path=$(CONFIG_FILE_PATH)
 endif
 	

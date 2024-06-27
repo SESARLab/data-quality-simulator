@@ -1,9 +1,14 @@
 Makefile
-Input/
+config-files/
+datasets/
 .build/
 README.md
-config-files/
+
+# development
 .vscode/
 .github/
 .devcontainer/
+
+# python
 __pycache__/
+requirements
