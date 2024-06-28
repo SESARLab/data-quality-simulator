@@ -1,4 +1,8 @@
-.PHONY: build test
+SHELL=/bin/bash
+UID=$(shell id -u)
+GID=$(shell id -g)
+
+.PHONY: build test run get-results count-results delete-all
 
 Package.resolved: Package.swift
 ifdef IS_DEVCONTAINER
@@ -25,8 +29,15 @@ run:
 ifdef IS_DEVCONTAINER
 	/DataBalanceSimulator --config-file-path=$(CONFIG_FILE_PATH)
 else
-	# docker build --target data-quality-simulator -t data-quality-simulator:latest .
-	# mkdir -p db/data && chown 100 db/data
-	docker compose up db simulator
+	mkdir -p db/data notebooks
+	UID=$(UID) GID=$(GID) docker compose up db simulator
 endif
 	
+get-results:
+	UID=$(UID) GID=$(GID) docker compose run --rm get-results
+
+count-results:
+	UID=$(UID) GID=$(GID) docker compose run --rm count-results
+
+delete-all:
+	UID=$(UID) GID=$(GID) docker compose run --rm delete-all

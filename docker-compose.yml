@@ -14,14 +14,9 @@ services:
       - ./db/data:/app/db
 
   db:
-    build:
-      context: .
-      dockerfile_inline: |
-        FROM keinos/sqlite3:3.46.0
-        USER root
-        # RUN mkdir /initdb.d /db && chmod 777 /initdb.d /db
-    image: simulations-db
+    image: keinos/sqlite3:3.46.0
     working_dir: /db
+    user: "${UID}:${GID}"
     volumes:
       - ./db/init/seed.sql:/initdb.d/seed.sql
       - ./db/data:/db
@@ -29,8 +24,21 @@ services:
       [
         "sh",
         "-c",
-        "cat /initdb.d/seed.sql | sqlite3 simulations.db && chmod 777 simulations.db"
+        "cat /initdb.d/seed.sql | sqlite3 simulations.db"
       ]
+
+  # https://stackoverflow.com/q/51120204/5587393
+  notebook:
+    image: quay.io/jupyter/base-notebook:latest
+    user: "${UID}:${GID}"
+    group_add:
+      - users
+    ports:
+      - 8889:8888
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./db/data:/home/jovyan/db:ro
+    command: start-notebook.py --NotebookApp.token='my-token'
 
   get-results:
     image: keinos/sqlite3:3.46.0
@@ -46,14 +54,27 @@ services:
           select * from results;\" | sqlite3 simulations.db"
       ]
 
-# db:
-#   image: mysql:8.4.0
-#   environment:
-#     MYSQL_ROOT_PASSWORD: root
-#     MYSQL_DATABASE: simulations
-#     MYSQL_USER: user
-#     MYSQL_PASSWORD: password123
-#   ports:
-#     - "3309:3306"
-#   volumes:
-#     - ./db/data:/var/lib/mysql
+  count-results:
+    image: keinos/sqlite3:3.46.0
+    working_dir: /db
+    volumes:
+      - ./db/data:/db:ro
+    command:
+      [
+        "sh",
+        "-c",
+        "echo \"select count(*) from results;\" | sqlite3 simulations.db"
+      ]
+
+  delete-all:
+    image: keinos/sqlite3:3.46.0
+    working_dir: /db
+    user: "${UID}:${GID}"
+    volumes:
+      - ./db/data:/db
+    command:
+      [
+        "sh",
+        "-c",
+        "echo \"delete from results;\" | sqlite3 simulations.db"
+      ]

@@ -81,6 +81,7 @@ struct SimulatorCLI: ParsableCommand {
             └─ datasetName=\(configManager[.datasetName])
         """)
 
+        logger.debug("Connecting to the database")
         let execResultsStorage = try ExecResultsStorage(
             dbPath: "./db/simulations.db"
         )
