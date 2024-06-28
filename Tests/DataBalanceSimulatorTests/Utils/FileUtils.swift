@@ -15,12 +15,12 @@ public class FileUtils {
         }
     }
 
-    public static func rmDirIfExists(atPath: String, withFM fileManager: FileManager) throws {
+    public static func rmDirIfExists(atPath path: String, withFM fileManager: FileManager) throws {
         var isDirectory: ObjCBool = false
-        let doesFileExist = fileManager.fileExists(atPath: atPath, isDirectory: &isDirectory) 
+        let doesFileExist = fileManager.fileExists(atPath: path, isDirectory: &isDirectory) 
 
         if (doesFileExist && isDirectory.boolValue) {
-            try fileManager.removeItem(at: URL(fileURLWithPath: atPath, isDirectory: true))
+            try fileManager.removeItem(at: URL(fileURLWithPath: path, isDirectory: true))
         }
     }
 
@@ -34,5 +34,9 @@ public class FileUtils {
         )
 
         fileManager.createFile(atPath: atPath, contents: jsonContent)
+    }
+
+    public static func getContent(ofFile path: String) throws -> String {
+        return try String(contentsOfFile: path)
     }
 }

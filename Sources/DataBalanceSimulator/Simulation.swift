@@ -41,16 +41,16 @@ class Simulation {
         let elapsedTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
         
         let simulationResult = Result(
-            metric: result.metricValue, 
+            metricValue: result.metricValue, 
             percentage: result.filteredPercent, 
-            execution_time: Double(elapsedTime) / 1_000_000_000
+            executionTime: Double(elapsedTime) / 1_000_000_000
         )
 
         logger.info("""
         Simulation results:
-            ├─ metric: \(simulationResult.metric)
+            ├─ metric: \(simulationResult.metricValue)
             ├─ percentage: \(simulationResult.percentage)
-            └─ execution_time: \(simulationResult.execution_time)
+            └─ execution_time: \(simulationResult.executionTime)
         """)
         return simulationResult
     }
@@ -100,8 +100,8 @@ class Simulation {
     }
 
     struct Result {
-        let metric: Double
+        let metricValue: Double
         let percentage: Double
-        let execution_time: Double
+        let executionTime: Double
     }
 }

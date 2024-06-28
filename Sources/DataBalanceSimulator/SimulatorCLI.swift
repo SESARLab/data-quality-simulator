@@ -82,6 +82,10 @@ struct SimulatorCLI: ParsableCommand {
             └─ datasetName=\(configManager[.datasetName])
         """)
 
+        let execResultsStorage = try ExecResultsStorage(
+            dbPath: "./db/simulations.db"
+        )
+
         let nodesRange = (configManager[.minNodes] as! Int)...(configManager[.maxNodes] as! Int)
         let servicesRange = (configManager[.minServices] as! Int)...(configManager[.maxServices] as! Int)
         let dataset = PythonModulesStore.getAttr(
@@ -89,36 +93,59 @@ struct SimulatorCLI: ParsableCommand {
             attr: configManager[.datasetName] as! String
         )()
 
-        for numberOfServices in servicesRange {
-            for numberOfNodes in nodesRange {
-                let nodes = Array(1...numberOfNodes * numberOfServices)
+        for servicesCount in servicesRange {
+            for nodesCount in nodesRange {
+                let nodes = Array(1...nodesCount * servicesCount)
                     .map { SimpleService(
                         id: $0, 
                         experimentSeed: configManager[.seed] as! Int,
                         filterLowerBound: configManager[.lowerBound] as! Double, 
                         filterUpperBound: configManager[.upperBound] as! Double
                     ) }
-                    .chunks(ofCount: numberOfServices).map { Array($0) }
+                    .chunks(ofCount: servicesCount).map { Array($0) }
 
-                for windowSize in 1...numberOfNodes {
+                for windowSize in 1...nodesCount {
                     let sim = try Simulation(
                         nodes: nodes, 
                         windowSize: windowSize, 
                         metricName: configManager[.metricName] as! String
                     )
 
-                    try sim.run(on: dataset)
-        //         lib.store([
-        //             "metric": result.metric,
-        //             "experiment_id": Double(EXPERIMENT_SEED),
-        //             "window_size": result.window_size,
-        //             "number_of_nodes": Double(numberOfNodes),
-        //             "number_of_services": Double(numberOfServices),
-        //             "percentage": result.percentage,
-        //             "execution_time": result.execution_time,
-        //         ])
+                    let simulationResults = try sim.run(on: dataset)
+
+                    try execResultsStorage.insert(ExecutionResults(
+                        executionTime: simulationResults.executionTime, 
+                        experimentId: configManager[.seed] as! Int, 
+                        windowSize: windowSize, 
+                        maxNodes: configManager[.maxNodes] as! Int, 
+                        nodesCount: nodesCount, 
+                        maxServices: configManager[.maxServices] as! Int, 
+                        servicesCount: servicesCount,
+                        dataset: configManager[.datasetName] as! String,
+                        metricName: configManager[.metricName] as! String,
+                        metricValue: simulationResults.metricValue, 
+                        percentage: simulationResults.percentage, 
+                        lowerBound: configManager[.lowerBound] as! Double, 
+                        upperBound: configManager[.upperBound] as! Double
+                    ))
                 }
             }
         }
+    }
+
+    struct ExecutionResults {
+        let executionTime: Double
+        let experimentId: Int
+        let windowSize: Int
+        let maxNodes: Int
+        let nodesCount: Int
+        let maxServices: Int
+        let servicesCount: Int
+        let dataset: String
+        let metricName: String
+        let metricValue: Double
+        let percentage: Double
+        let lowerBound: Double
+        let upperBound: Double
     }
 }

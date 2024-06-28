@@ -1,16 +1,6 @@
 from scipy.spatial import distance
 import numpy as np
 
-from pandas import DataFrame
-# from sqlalchemy import create_engine, types
-# my_conn = create_engine("mysql+mysqldb://root:r00t@mysql:3306/pippo")  # fill details
-# my_conn = my_conn.connect()
-# lowerBound = 0.0
-# upperBound = 0.0
-# number_of_nodes = 0
-# number_of_services = 0
-
-
 def qualitative(df1, df2):
     ds = []
     ws = []
@@ -36,11 +26,3 @@ def qualitative(df1, df2):
 
 def quantitative(df1, df2):
     return len(df2)/len(df1)
-
-
-# def store(item):
-#     my_conn = create_engine("mysql+mysqldb://root:r00t@mysql:3306/pippo")  # fill details
-#     my_conn2 = my_conn.connect()
-#     DataFrame(item, index=[0]).to_sql(f'qualitative_n{number_of_nodes}_s{number_of_services}_{int(lowerBound*100)}_{int(upperBound*100)}', my_conn, if_exists='append', index=False)
-#     my_conn2.close()
-#     my_conn.dispose()
