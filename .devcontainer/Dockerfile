@@ -7,7 +7,7 @@ WORKDIR /src
 
 RUN <<EOF
     apt-get update
-    apt-get install -y python3 python3-pip python3-venv python3-mysqldb libmysqlclient-dev
+    apt-get install -y python3 python3-pip sqlite3 libsqlite3-dev
 EOF
 
 RUN --mount=type=bind,source=requirements.txt,target=requirements.txt \ 

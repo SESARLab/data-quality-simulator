@@ -20,7 +20,8 @@
                 "pvasek.sourcekit-lsp--dev-unofficial",
                 "sswg.swift-lang",
                 "vadimcn.vscode-lldb",
-                "ms-python.python"
+                "ms-python.python",
+                "ms-azuretools.vscode-docker"
             ],
             "settings": {
                 "lldb.adapterType": "bundled",

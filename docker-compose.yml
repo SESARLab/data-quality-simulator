@@ -1,0 +1,59 @@
+services:
+  simulator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: data-quality-simulator
+    image: data-quality-simulator
+    depends_on:
+      db:
+        condition: service_completed_successfully
+    volumes:
+      - ./config-files:/app/config-files
+      - ./datasets:/app/datasets
+      - ./db/data:/app/db
+
+  db:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM keinos/sqlite3:3.46.0
+        USER root
+        # RUN mkdir /initdb.d /db && chmod 777 /initdb.d /db
+    image: simulations-db
+    working_dir: /db
+    volumes:
+      - ./db/init/seed.sql:/initdb.d/seed.sql
+      - ./db/data:/db
+    command:
+      [
+        "sh",
+        "-c",
+        "cat /initdb.d/seed.sql | sqlite3 simulations.db && chmod 777 simulations.db"
+      ]
+
+  get-results:
+    image: keinos/sqlite3:3.46.0
+    working_dir: /db
+    volumes:
+      - ./db/data:/db:ro
+    command:
+      [
+        "sh",
+        "-c",
+        "printf \".mode markdown
+
+          select * from results;\" | sqlite3 simulations.db"
+      ]
+
+# db:
+#   image: mysql:8.4.0
+#   environment:
+#     MYSQL_ROOT_PASSWORD: root
+#     MYSQL_DATABASE: simulations
+#     MYSQL_USER: user
+#     MYSQL_PASSWORD: password123
+#   ports:
+#     - "3309:3306"
+#   volumes:
+#     - ./db/data:/var/lib/mysql

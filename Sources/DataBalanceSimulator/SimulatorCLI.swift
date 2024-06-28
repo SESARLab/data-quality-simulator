@@ -75,7 +75,6 @@ struct SimulatorCLI: ParsableCommand {
             ├─ maxNodes=\(configManager[.maxNodes])
             ├─ minServices=\(configManager[.minServices])
             ├─ maxServices=\(configManager[.maxServices])
-            ├─ minNodes=\(configManager[.minNodes])
             ├─ lowerBound=\(configManager[.lowerBound])
             ├─ upperBound=\(configManager[.upperBound])
             ├─ metricName=\(configManager[.metricName])
