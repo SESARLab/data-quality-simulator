@@ -11,7 +11,8 @@ class SimulatorConfigsFactory {
             ConfigProperties.lowerBound: 0.1, 
             ConfigProperties.upperBound: 1.0,
             ConfigProperties.metricName: "qualitative",
-            ConfigProperties.datasetName: "mydataset"
+            ConfigProperties.datasetName: "mydataset",
+            ConfigProperties.dbPath: "mydb"
         ]
     }
 }

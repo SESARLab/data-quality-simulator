@@ -40,7 +40,8 @@ RUN --mount=type=cache,target=/swift-cache \
     --mount=type=bind,source=./Tests,target=/src/Tests \
     --mount=type=bind,source=./python-modules,target=/src/python-modules \
     --mount=type=bind,source=./Package.swift,target=/src/Package.swift \
-    --mount=type=bind,source=./Package.reslsolved,target=/src/Package.resolved \
+    --mount=type=bind,source=./Package.resolved,target=/src/Package.resolved \
+    --mount=type=bind,source=./db/init,target=/src/db/init \
     swift test --cache-path /swift-cache --configuration release
 
 

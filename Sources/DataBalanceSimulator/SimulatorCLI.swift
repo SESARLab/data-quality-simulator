@@ -49,6 +49,11 @@ struct SimulatorCLI: ParsableCommand {
     var datasetName: String?
 
     @Option(name: .long, help: """
+        The location of the db where execution results are stored 
+        """)
+    var dbPath: String?
+
+    @Option(name: .long, help: """
     Configuration file containing the same properties as the CLI in the Json format
     The CLI options can overwrite these configurations
     """)
@@ -56,7 +61,7 @@ struct SimulatorCLI: ParsableCommand {
 
     public func run() throws {
         LoggingSystem.bootstrap(StreamLogHandler.standardError)
-        let logger = Logger(label: #file.getFileName())
+        let logger = Logger.createWithLevelFromEnv(fileName: #file)
         let configManager = try ConfigurationManager(simulatorCliConfigs: [
             .seed: seed,
             .minNodes: minNodes,
@@ -66,7 +71,8 @@ struct SimulatorCLI: ParsableCommand {
             .lowerBound: lowerBound,
             .upperBound: upperBound,
             .metricName: metricName,
-            .datasetName: datasetName
+            .datasetName: datasetName,
+            .dbPath: dbPath
         ], configFilePathOpt: configFilePath)
         logger.info("""
         Starting with simulator with:
@@ -78,20 +84,25 @@ struct SimulatorCLI: ParsableCommand {
             ├─ lowerBound=\(configManager[.lowerBound])
             ├─ upperBound=\(configManager[.upperBound])
             ├─ metricName=\(configManager[.metricName])
-            └─ datasetName=\(configManager[.datasetName])
+            ├─ datasetName=\(configManager[.datasetName])
+            └─ dbPath=\(configManager[.dbPath])
         """)
 
-        logger.debug("Connecting to the database")
+        logger.debug("Connecting to the database...")
         let execResultsStorage = try ExecResultsStorage(
-            dbPath: "./db/simulations.db"
+            dbPath: configManager[.dbPath] as! String
         )
+        logger.debug("Connected to the database ✅")
 
         let nodesRange = (configManager[.minNodes] as! Int)...(configManager[.maxNodes] as! Int)
         let servicesRange = (configManager[.minServices] as! Int)...(configManager[.maxServices] as! Int)
+        
+        logger.debug("Loading the dataset...")
         let dataset = PythonModulesStore.getAttr(
             module: PythonModulesStore.dataset, 
             attr: configManager[.datasetName] as! String
         )()
+        logger.debug("Dataset loaded ✅")
 
         for servicesCount in servicesRange {
             for nodesCount in nodesRange {
@@ -113,6 +124,7 @@ struct SimulatorCLI: ParsableCommand {
 
                     let simulationResults = try sim.run(on: dataset)
 
+                    logger.debug("Insert of execution data into database...")
                     try execResultsStorage.insert(ExecutionResults(
                         executionTime: simulationResults.executionTime, 
                         experimentId: configManager[.seed] as! Int, 
@@ -128,6 +140,7 @@ struct SimulatorCLI: ParsableCommand {
                         lowerBound: configManager[.lowerBound] as! Double, 
                         upperBound: configManager[.upperBound] as! Double
                     ))
+                    logger.debug("Insert of execution data successful ✅")
                 }
             }
         }

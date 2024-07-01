@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
       target: data-quality-simulator
     image: data-quality-simulator
+    environment:
+      LOGGER_LEVEL: ${SIMULATOR_LOGGER_LEVEL:-info}
     depends_on:
       db:
         condition: service_completed_successfully
@@ -16,7 +18,9 @@ services:
   db:
     image: keinos/sqlite3:3.46.0
     working_dir: /db
-    user: "${UID}:${GID}"
+    user: "${uid}:${gid}"
+    group_add:
+      - sqlite
     volumes:
       - ./db/init/seed.sql:/initdb.d/seed.sql
       - ./db/data:/db
@@ -24,13 +28,13 @@ services:
       [
         "sh",
         "-c",
-        "cat /initdb.d/seed.sql | sqlite3 simulations.db"
+        "cat /initdb.d/seed.sql | sqlite3 simulations.db && chmod 666 simulations.db"
       ]
 
   # https://stackoverflow.com/q/51120204/5587393
   notebook:
     image: quay.io/jupyter/base-notebook:latest
-    user: "${UID}:${GID}"
+    user: "${uid}:${gid}"
     group_add:
       - users
     ports:
@@ -69,7 +73,7 @@ services:
   delete-all:
     image: keinos/sqlite3:3.46.0
     working_dir: /db
-    user: "${UID}:${GID}"
+    user: "${uid}:${gid}"
     volumes:
       - ./db/data:/db
     command:

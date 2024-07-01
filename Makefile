@@ -1,6 +1,7 @@
 SHELL=/bin/bash
-UID=$(shell id -u)
-GID=$(shell id -g)
+uid=$(shell id -u)
+gid=$(shell id -g)
+SIMULATOR_LOGGER_LEVEL ?= info
 
 .PHONY: build test run get-results count-results delete-all
 
@@ -25,19 +26,31 @@ else
 	docker build --target test .
 endif
 
-run:
+create-db:
+	rm -r db/data
+	mkdir -p db/data
 ifdef IS_DEVCONTAINER
-	/DataBalanceSimulator --config-file-path=$(CONFIG_FILE_PATH)
+	echo "Run this task from Host"
+	exit 1
 else
+	uid=$(uid) gid=$(gid) docker compose run --rm db
+endif
+
+run:
 	mkdir -p db/data notebooks
-	UID=$(UID) GID=$(GID) docker compose up db simulator
+ifdef IS_DEVCONTAINER
+	swift run DataBalanceSimulator --config-file-path=$(CONFIG_FILE_PATH) \
+		--db-path=./db/data/simulations.db
+else
+	SIMULATOR_LOGGER_LEVEL=$(SIMULATOR_LOGGER_LEVEL) uid=$(uid) gid=$(gid) \
+		docker compose up --build db simulator
 endif
 	
 get-results:
-	UID=$(UID) GID=$(GID) docker compose run --rm get-results
+	uid=$(uid) gid=$(gid) docker compose run --rm get-results
 
 count-results:
-	UID=$(UID) GID=$(GID) docker compose run --rm count-results
+	uid=$(uid) gid=$(gid) docker compose run --rm count-results
 
 delete-all:
-	UID=$(UID) GID=$(GID) docker compose run --rm delete-all
+	uid=$(uid) gid=$(gid) docker compose run --rm delete-all

@@ -23,7 +23,7 @@ class Simulation {
         self.nodes = nodes
         self.windowSize = windowSize
         self.metricName = metricName
-        self.logger = Logger(label: #file.getFileName())
+        self.logger = Logger.createWithLevelFromEnv(fileName: #file)
     }
 
     public func run(on data: PythonObject) throws -> Result {

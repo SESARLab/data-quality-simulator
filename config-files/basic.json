@@ -7,5 +7,6 @@
     "lowerBound": 0.1,
     "seed": 1,
     "metricName": "qualitative",
-    "datasetName": "inmates_enriched_10k"
+    "datasetName": "inmates_enriched_10k",
+    "dbPath": "./db/simulations.db"
 }

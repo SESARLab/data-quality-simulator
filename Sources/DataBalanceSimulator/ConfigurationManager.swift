@@ -20,6 +20,7 @@ enum ConfigProperties: String, CaseIterable {
     case upperBound
     case metricName
     case datasetName
+    case dbPath
 
     func isTypeCompatibleWith(value: LosslessStringConvertible) -> Bool {
         switch self {
@@ -32,6 +33,7 @@ enum ConfigProperties: String, CaseIterable {
             case .upperBound: return Double("\(value)") != nil
             case .metricName: return value is String
             case .datasetName: return value is String
+            case .dbPath: return value is String
         }
     }
 }
@@ -130,6 +132,7 @@ class ConfigurationManager {
                     case .upperBound: Double("\(value)")
                     case .metricName: String(describing: value)
                     case .datasetName: String(describing: value)
+                    case .dbPath: String(describing: value)
                 }
 
                 if castValue != nil {
