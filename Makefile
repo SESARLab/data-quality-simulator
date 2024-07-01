@@ -42,6 +42,7 @@ ifdef IS_DEVCONTAINER
 	swift run DataBalanceSimulator --config-file-path=$(CONFIG_FILE_PATH) \
 		--db-path=./db/data/simulations.db
 else
+	SIMULATOR_CONFIG_FILE_PATH=$(CONFIG_FILE_PATH) \
 	SIMULATOR_LOGGER_LEVEL=$(SIMULATOR_LOGGER_LEVEL) uid=$(uid) gid=$(gid) \
 		docker compose up --build db simulator
 endif

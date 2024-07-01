@@ -10,6 +10,10 @@ services:
     depends_on:
       db:
         condition: service_completed_successfully
+    command:
+      [
+        "--config-file-path=${SIMULATOR_CONFIG_FILE_PATH:-/app/config-files/basic.json}"
+      ]
     volumes:
       - ./config-files:/app/config-files
       - ./datasets:/app/datasets

@@ -11,7 +11,7 @@ docker run --rm -it --cap-add=SYS_PTRACE --security-opt seccomp=unconfined swift
 To run the project in a container, then:
 
 ```bash
-make run
+make run CONFIG_FILE_PATH=/app/config-files/basic.json
 ```
 
 If the environment already have Swift installed (e.g. when you are developing using VSCode devcontainer feature):
