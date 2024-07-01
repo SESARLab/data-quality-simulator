@@ -37,7 +37,11 @@ services:
 
   # https://stackoverflow.com/q/51120204/5587393
   notebook:
-    image: quay.io/jupyter/base-notebook:latest
+    build:
+      dockerfile_inline: |
+        FROM quay.io/jupyter/base-notebook:latest
+        RUN pip install pandas==2.2.2 matplotlib==3.9.0
+    image: notebook
     user: "${uid}:${gid}"
     group_add:
       - users

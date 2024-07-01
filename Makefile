@@ -46,6 +46,10 @@ else
 	SIMULATOR_LOGGER_LEVEL=$(SIMULATOR_LOGGER_LEVEL) uid=$(uid) gid=$(gid) \
 		docker compose up --build db simulator
 endif
+
+open-notebook:
+	uid=$(uid) gid=$(gid) docker compose up -d notebook
+	xdg-open http://localhost:8889/lab?token=my-token &> /dev/null
 	
 get-results:
 	uid=$(uid) gid=$(gid) docker compose run --rm get-results
