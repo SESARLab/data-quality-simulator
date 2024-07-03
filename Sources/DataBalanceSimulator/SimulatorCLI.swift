@@ -104,12 +104,14 @@ struct SimulatorCLI: ParsableCommand {
         )()
         logger.debug("Dataset loaded ✅")
 
+        let experimentSeed = configManager[.seed] as! Int
         for servicesCount in servicesRange {
             for nodesCount in nodesRange {
                 let nodes = Array(1...nodesCount * servicesCount)
                     .map { SimpleService(
-                        id: $0, 
-                        experimentSeed: configManager[.seed] as! Int,
+                        id: $0,
+                        filteringSeed: Double($0 * experimentSeed),
+                        experimentSeed: experimentSeed,
                         filterLowerBound: configManager[.lowerBound] as! Double, 
                         filterUpperBound: configManager[.upperBound] as! Double
                     ) }

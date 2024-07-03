@@ -49,6 +49,13 @@ endif
 
 open-notebook:
 	uid=$(uid) gid=$(gid) docker compose up -d notebook
+	while true; do \
+		NOTEBOOK_CONTAINER_STATUS=$$(docker container inspect -f '{{ .State.Health.Status }}' jupyter-notebook); \
+		if [ "$$NOTEBOOK_CONTAINER_STATUS" == "healthy" ]; then \
+			break; \
+		fi; \
+		sleep 1; \
+	done
 	xdg-open http://localhost:8889/lab?token=my-token &> /dev/null
 	
 get-results:

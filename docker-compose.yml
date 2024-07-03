@@ -22,7 +22,7 @@ services:
   db:
     image: keinos/sqlite3:3.46.0
     working_dir: /db
-    user: "${uid}:${gid}"
+    user: "${uid:-1000}:${gid:-1000}"
     group_add:
       - sqlite
     volumes:
@@ -42,7 +42,8 @@ services:
         FROM quay.io/jupyter/base-notebook:latest
         RUN pip install pandas==2.2.2 matplotlib==3.9.0
     image: notebook
-    user: "${uid}:${gid}"
+    container_name: jupyter-notebook
+    user: "${uid:-1000}:${gid:-1000}"
     group_add:
       - users
     ports:
@@ -81,7 +82,7 @@ services:
   delete-all:
     image: keinos/sqlite3:3.46.0
     working_dir: /db
-    user: "${uid}:${gid}"
+    user: "${uid:-1000}:${gid:-1000}"
     volumes:
       - ./db/data:/db
     command:
