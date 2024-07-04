@@ -33,4 +33,23 @@ extension Logger {
 
         return logger
     }
+
+    func log(withDescription description: String, withProps props: [String: String]) {
+        guard !props.isEmpty else {
+            return self.info("\(description)")
+        }
+        
+        var log = "\(description)\n"
+        
+        let keys = props.keys
+        for (index, key) in keys.enumerated() {
+            if index == keys.count - 1 {
+                log += "    └─ \(key): \(props[key]!)\n"
+            } else {
+                log += "    ├─ \(key): \(props[key]!)\n"
+            }
+        }
+        
+        self.info("\(log)")
+    }
 }

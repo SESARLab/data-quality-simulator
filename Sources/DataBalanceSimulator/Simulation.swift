@@ -3,7 +3,7 @@ import Foundation
 import Logging
 
 class Simulation {
-    let nodes: [[SimpleService]]
+    let nodes: [[BaseService]]
 
     let windowSize: Int
 
@@ -12,7 +12,7 @@ class Simulation {
     let logger: Logger
 
     init(
-        nodes: [[SimpleService]],
+        nodes: [[BaseService]],
         windowSize: Int,
         metricName: String
     ) throws {
@@ -27,12 +27,11 @@ class Simulation {
     }
 
     public func run(on data: PythonObject) throws -> Result {
-        logger.info("""
-        Starting simulation with:
-            ├─ windowSize: \(windowSize)
-            ├─ nodeCount: \(nodes.count)
-            └─ nodes: \(nodes)
-        """)
+        logger.log(withDescription: "Starting simulation", withProps: [
+            "windowSize": "\(windowSize)",
+            "nodeCount": "\(nodes.count)",
+            "nodes": "\(nodes)"
+        ])
 
         let startTime = DispatchTime.now()
         let result = try internalRun(on: data)
@@ -46,24 +45,24 @@ class Simulation {
             executionTime: Double(elapsedTime) / 1_000_000_000
         )
 
-        logger.info("""
-        Simulation results:
-            ├─ metric: \(simulationResult.metricValue)
-            ├─ percentage: \(simulationResult.percentage)
-            └─ execution_time: \(simulationResult.executionTime)
-        """)
+        logger.log(withDescription: "Simulation results", withProps: [
+            "metric": "\(simulationResult.metricValue)",
+            "percentage": "\(simulationResult.percentage)",
+            "execution_time": "\(simulationResult.executionTime)"
+        ])
+        
         return simulationResult
     }
 
     private func internalRun(on data: PythonObject) throws -> StatsCalculator {
         let windows = nodes.windows(ofCount: windowSize)
-        var previouslyChosenServices: [SimpleService] = []
-        var pipelineCache: [([SimpleService], PythonObject)] = []
+        var previouslyChosenServices: [BaseService] = []
+        var pipelineCache: [([BaseService], PythonObject)] = []
         let originalDataset = data
         var bestStats: StatsCalculator? = nil
 
         for (index, window) in windows.enumerated() {
-            var bestServiceComb: (services: [SimpleService], stats: StatsCalculator)?
+            var bestServiceComb: (services: [BaseService], stats: StatsCalculator)?
 
             for servicesCombination in Array(window).cartesianProduct() {
                 let pipeline = try Pipeline(

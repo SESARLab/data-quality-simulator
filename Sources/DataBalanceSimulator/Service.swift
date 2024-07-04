@@ -1,26 +1,9 @@
 import CryptoSwift
 import PythonKit
 import Foundation
+import Logging
 
-protocol Service: Equatable, CustomStringConvertible {
-    var id: Int { get }
-    func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject
-}
-
-protocol Context {}
-
-struct SimpleContext: Context {
-    var previouslyChosenServices: [SimpleService]
-    var accumulatedFilteringSeed: [UInt8]
-}
-
-extension Service {
-    static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.id == rhs.id
-    }
-}
-
-struct SimpleService: Service {
+class BaseService: Equatable, CustomStringConvertible {
     var id: Int
 
     let experimentSeed: Int
@@ -31,40 +14,29 @@ struct SimpleService: Service {
 
     let filterUpperBound: Double
 
-    var description: String {
-        return "SS" + String(format: "%02d", id)
-    }
+    let logger: Logger
 
-    init(id: Int, 
-        filteringSeed: Double? = nil, 
+    init(id: Int,
         experimentSeed: Int,
         filterLowerBound: Double,
         filterUpperBound: Double
     ) {
         self.id = id
-        self.filteringSeed = (filteringSeed ?? Double.random(in: 0...1)).bytes
         self.experimentSeed = experimentSeed
+        let generatorSeed = id * experimentSeed
+        var randomGenerator = MTGenerator(seed: UInt32(generatorSeed))
+        self.filteringSeed = Double.random(in: 0...1, using: &randomGenerator).bytes
         self.filterLowerBound = filterLowerBound
         self.filterUpperBound = filterUpperBound
+        self.logger = Logger.createWithLevelFromEnv(fileName: #file)
     }
 
-    /// Run the service and filter using the percent computed by finalFilteringPercent
-    /// - Parameters:
-    ///   - dataframe: Pandas dataframe containing the dataset
-    ///   - context: the execution context, which includes the previously executed services
-    /// - Returns: the filtered dataframe and the filtering percent applied
-    public func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject {
-        precondition(context is SimpleContext, "A SimpleService requires a SimpleContext when it runs")
-
-        let ctx = context as! SimpleContext
-
-        return dataframe.sample(
-            frac: self.finalFilteringPercent(from: ctx),
-            random_state: self.experimentSeed
-        )
+    func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject {
+        assertionFailure("This method should be never called on the base class")
+        return dataframe
     }
 
-    public func finalFilteringPercent(from context: SimpleContext) -> Double {
+    public func finalFilteringPercent(from context: Context) -> Double {
         let servicesLineageSeed = context.accumulatedFilteringSeed + self.filteringSeed
 
         return generatePercent(usingHashFrom: servicesLineageSeed)
@@ -79,5 +51,73 @@ struct SimpleService: Service {
             to: self.filterUpperBound
         )
         return normalizedPercent
+    }
+
+    static func == (lhs: BaseService, rhs: BaseService) -> Bool {
+        return lhs.id == rhs.id
+    }
+
+    var description: String {
+        get {
+            return "S" + String(format: "%02d", id)
+        }
+    }
+}
+
+struct Context {
+    var previouslyChosenServices: [BaseService]
+    var accumulatedFilteringSeed: [UInt8]
+}
+
+class RowFilterService: BaseService {
+    override init(id: Int,
+        experimentSeed: Int,
+        filterLowerBound: Double,
+        filterUpperBound: Double
+    ) {
+        super.init(id: id, 
+            experimentSeed: experimentSeed, 
+            filterLowerBound: filterLowerBound, 
+            filterUpperBound: filterUpperBound
+        )
+
+        logger.log(withDescription: " Creating Service \(id)", withProps: [
+            "filteringSeed" : "\(filteringSeed)"
+        ])
+    }
+
+    override var description: String {
+        get {
+            return "RF" + super.description
+        }
+    }
+
+    /// Run the service and filter rows using the percent computed by finalFilteringPercent
+    /// - Parameters:
+    ///   - dataframe: Pandas dataframe containing the dataset
+    ///   - context: the execution context, which includes the previously executed services
+    /// - Returns: the filtered dataframe
+    override public func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject {
+        return dataframe.sample(
+            frac: self.finalFilteringPercent(from: context),
+            random_state: self.experimentSeed
+        )
+    }
+}
+
+class ColumnFilterService: BaseService {
+    /// Run the service and filter columns using the percent computed by finalFilteringPercent
+    /// - Parameters:
+    ///   - dataframe: Pandas dataframe containing the dataset
+    ///   - context: the execution context, which includes the previously executed services
+    /// - Returns: the filtered dataframe
+    override public func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject {
+        return dataframe
+    }
+
+    override var description: String {
+        get {
+            return "CF" + super.description
+        }
     }
 }

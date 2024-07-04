@@ -16,7 +16,7 @@ public class SimulationTests: XCTestCase {
     }
 
     func testGivenSimulationWith2NodesAndWin1_whenRun_thenChooseBestCombination() throws {
-        let nodes = SimpleServiceFactory.buildGroups(
+        let nodes = RowFilterServiceFactory.buildGroups(
             withFilterPercents: [0.1, 0.5], [0.5, 0.1]
         )
         let dataset = DatasetFactory.build(withDatasetSize: 100)
@@ -32,7 +32,7 @@ public class SimulationTests: XCTestCase {
     }
 
     func testGivenSimulationWith3NodesAndWin2_whenRun_thenChooseBestCombination() throws {
-        let nodes = SimpleServiceFactory.buildGroups(
+        let nodes = RowFilterServiceFactory.buildGroups(
             withFilterPercents: [0.1, 0.5], [0.5, 0.1], [0.1, 0.5]
         )
         let dataset = DatasetFactory.build(withDatasetSize: 64)
@@ -48,7 +48,7 @@ public class SimulationTests: XCTestCase {
     }
 
     func testGivenSimulationWithSameWinAndNodeCount_whenRun_thenChooseBestCombination() throws {
-        let nodes = SimpleServiceFactory.buildGroups(
+        let nodes = RowFilterServiceFactory.buildGroups(
             withFilterPercents: [0.1, 0.5], [0.5, 0.1]
         )
         let dataset = DatasetFactory.build(withDatasetSize: 100)

@@ -17,16 +17,4 @@ class DatasetFactory {
 
         return df
     }
-
-    // public static func build(withVariability variability: Double = 0.5) -> PythonObject {
-    //     assert(variability >= 0 && variability <= 1)
-    //     pd.Dataframe(np.array())
-    //     return SimpleService(
-    //         id: 1, 
-    //         filteringSeed: 0,
-    //         experimentSeed: 10,
-    //         filterLowerBound: 0.5, 
-    //         filterUpperBound: 0.8
-    //     )
-    // }
 }

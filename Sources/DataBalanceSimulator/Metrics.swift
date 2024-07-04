@@ -28,18 +28,19 @@ struct StatsCalculator {
         self.metricName = metricName
         self.pipeline = pipeline
 
-        // TODO: filteredDataset.count / originalDataset.count ?
-        var accumulatedFilteringSeed: [UInt8] = []
-        var previousServices: [SimpleService] = []
-        self.filteredPercent = self.pipeline.services.reduce(1.0, { (result, current) -> Double in 
-            let newPercent = result * current.finalFilteringPercent(from: SimpleContext(
-                previouslyChosenServices: previousServices,
-                accumulatedFilteringSeed: accumulatedFilteringSeed))
-            previousServices.append(current)
-            accumulatedFilteringSeed += current.filteringSeed
+        self.filteredPercent = Double(filteredDataset.count) / Double(originalDataset.count)
+        // TODO: the next commented section is the old way to compute the filteredPercent
+        // var accumulatedFilteringSeed: [UInt8] = []
+        // var previousServices: [SimpleService] = []
+        // self.filteredPercent = self.pipeline.services.reduce(1.0, { (result, current) -> Double in 
+        //     let newPercent = result * current.finalFilteringPercent(from: SimpleContext(
+        //         previouslyChosenServices: previousServices,
+        //         accumulatedFilteringSeed: accumulatedFilteringSeed))
+        //     previousServices.append(current)
+        //     accumulatedFilteringSeed += current.filteringSeed
 
-            return newPercent
-        })
+        //     return newPercent
+        // })
 
         let metricCalculator = PythonModulesStore.getAttr(
             module: PythonModulesStore.metrics, 

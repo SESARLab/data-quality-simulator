@@ -3,10 +3,10 @@ import XCTest
 
 public class SimpleServiceTests: XCTestCase {
     func testGivenSimpleServiceAsFirst_whenRun_thenFilterDataset() throws {
-        let s = SimpleServiceFactory.build(withFilterPercent: 0.5)
+        let s = RowFilterServiceFactory.build(withFilterPercent: 0.5)
         let dataset = DatasetFactory.build(withDatasetSize: 100)
 
-        let filteredDataset = s.run(on: dataset, withContext: SimpleContext(
+        let filteredDataset = s.run(on: dataset, withContext: Context(
             previouslyChosenServices: [],
             accumulatedFilteringSeed: []
         ))
@@ -15,11 +15,11 @@ public class SimpleServiceTests: XCTestCase {
     }
 
     func testGivenSimpleServiceAsSecond_whenRun_thenFilterDataset() throws {
-        let s = SimpleServiceFactory.build(withId: 1, withFilterPercent: 0.5)
-        let prevService = SimpleServiceFactory.build(withId: 2)
+        let s = RowFilterServiceFactory.build(withId: 1, withFilterPercent: 0.5)
+        let prevService = RowFilterServiceFactory.build(withId: 2)
         let dataset = DatasetFactory.build(withDatasetSize: 100)
 
-        let filteredDataset = s.run(on: dataset, withContext: SimpleContext(
+        let filteredDataset = s.run(on: dataset, withContext: Context(
             previouslyChosenServices: [prevService],
             accumulatedFilteringSeed: prevService.filteringSeed
         ))

@@ -2,7 +2,7 @@
 
 class SimulationFactory {
     public static func build(
-        withNodes nodes: [[SimpleService]], 
+        withNodes nodes: [[BaseService]], 
         withWindowSize winSize: Int
     ) throws -> Simulation {
         return try Simulation(

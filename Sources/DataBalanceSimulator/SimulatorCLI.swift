@@ -74,19 +74,18 @@ struct SimulatorCLI: ParsableCommand {
             .datasetName: datasetName,
             .dbPath: dbPath
         ], configFilePathOpt: configFilePath)
-        logger.info("""
-        Starting with simulator with:
-            ├─ seed=\(configManager[.seed])
-            ├─ minNodes=\(configManager[.minNodes])
-            ├─ maxNodes=\(configManager[.maxNodes])
-            ├─ minServices=\(configManager[.minServices])
-            ├─ maxServices=\(configManager[.maxServices])
-            ├─ lowerBound=\(configManager[.lowerBound])
-            ├─ upperBound=\(configManager[.upperBound])
-            ├─ metricName=\(configManager[.metricName])
-            ├─ datasetName=\(configManager[.datasetName])
-            └─ dbPath=\(configManager[.dbPath])
-        """)
+        logger.log(withDescription: "Starting simulator", withProps: [
+            "seed": "\(configManager[.seed])",
+            "minNodes": "\(configManager[.minNodes])",
+            "maxNodes": "\(configManager[.maxNodes])",
+            "minServices": "\(configManager[.minServices])",
+            "maxServices": "\(configManager[.maxServices])",
+            "lowerBound": "\(configManager[.lowerBound])",
+            "upperBound": "\(configManager[.upperBound])",
+            "metricName": "\(configManager[.metricName])",
+            "datasetName": "\(configManager[.datasetName])",
+            "dbPath": "\(configManager[.dbPath])"
+        ])
 
         logger.debug("Connecting to the database...")
         let execResultsStorage = try ExecResultsStorage(
@@ -108,9 +107,8 @@ struct SimulatorCLI: ParsableCommand {
         for servicesCount in servicesRange {
             for nodesCount in nodesRange {
                 let nodes = Array(1...nodesCount * servicesCount)
-                    .map { SimpleService(
+                    .map { RowFilterService(
                         id: $0,
-                        filteringSeed: Double($0 * experimentSeed),
                         experimentSeed: experimentSeed,
                         filterLowerBound: configManager[.lowerBound] as! Double, 
                         filterUpperBound: configManager[.upperBound] as! Double

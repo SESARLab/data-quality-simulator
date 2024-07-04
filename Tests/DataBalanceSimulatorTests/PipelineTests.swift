@@ -16,7 +16,7 @@ public class PipelineTests: XCTestCase {
     }
 
     func testGivenPipelineWith1Service_whenRun_thenExecute1() throws {
-        let s = SimpleServiceFactory.build(withFilterPercent: 0.5)
+        let s = RowFilterServiceFactory.build(withFilterPercent: 0.5)
         let dataset = DatasetFactory.build(withDatasetSize: 100)
         let pipeline = try PipelineFactory.build(withServices: [s])
 
@@ -26,8 +26,8 @@ public class PipelineTests: XCTestCase {
     }
 
     func testGivenPipelineWithMultipleServices_whenRun_thenExecuteSequentially() throws {
-        let s1 = SimpleServiceFactory.build(withId: 1, withFilterPercent: 0.5)
-        let s2 = SimpleServiceFactory.build(withId: 2, withFilterPercent: 0.5)
+        let s1 = RowFilterServiceFactory.build(withId: 1, withFilterPercent: 0.5)
+        let s2 = RowFilterServiceFactory.build(withId: 2, withFilterPercent: 0.5)
         let dataset = DatasetFactory.build(withDatasetSize: 100)
         let pipeline = try PipelineFactory.build(withServices: [s1, s2])
 
@@ -37,8 +37,8 @@ public class PipelineTests: XCTestCase {
     }
 
     func testGivenPipelineWithCacheEmpty_whenRun_thenExecuteAllServices() throws {
-        let s1 = SimpleServiceFactory.build(withId: 1, withFilterPercent: 0.5)
-        let s2 = SimpleServiceFactory.build(withId: 2, withFilterPercent: 0.5)
+        let s1 = RowFilterServiceFactory.build(withId: 1, withFilterPercent: 0.5)
+        let s2 = RowFilterServiceFactory.build(withId: 2, withFilterPercent: 0.5)
         let dataset = DatasetFactory.build(withDatasetSize: 100)
         let pipeline = try PipelineFactory.build(withServices: [s1, s2])
 
@@ -48,9 +48,9 @@ public class PipelineTests: XCTestCase {
     }
 
     func testGivenPipelineWithCacheMiss_whenRun_thenExecuteAllServices() throws {
-        let s1 = SimpleServiceFactory.build(withId: 1, withFilterPercent: 0.5)
-        let s2 = SimpleServiceFactory.build(withId: 2, withFilterPercent: 0.5)
-        let s3 = SimpleServiceFactory.build(withId: 3, withFilterPercent: 0.5)
+        let s1 = RowFilterServiceFactory.build(withId: 1, withFilterPercent: 0.5)
+        let s2 = RowFilterServiceFactory.build(withId: 2, withFilterPercent: 0.5)
+        let s3 = RowFilterServiceFactory.build(withId: 3, withFilterPercent: 0.5)
         let dataset = DatasetFactory.build(withDatasetSize: 100)
         let dumbDataset = DatasetFactory.build(withDatasetSize: 1)
         let pipeline = try PipelineFactory.build(withServices: [s1, s2])
@@ -61,8 +61,8 @@ public class PipelineTests: XCTestCase {
     }
 
     func testGivenPipelineWithCacheHit_whenRun_thenExecuteRemainingServices() throws {
-        let s1 = SimpleServiceFactory.build(withId: 1, withFilterPercent: 0.5)
-        let s2 = SimpleServiceFactory.build(withId: 2, withFilterPercent: 0.5)
+        let s1 = RowFilterServiceFactory.build(withId: 1, withFilterPercent: 0.5)
+        let s2 = RowFilterServiceFactory.build(withId: 2, withFilterPercent: 0.5)
         let dataset = DatasetFactory.build(withDatasetSize: 100)
         let cachedDataset = DatasetFactory.build(withDatasetSize: 10)
         let pipeline = try PipelineFactory.build(withServices: [s1, s2])
@@ -73,8 +73,8 @@ public class PipelineTests: XCTestCase {
     }
 
     func testGivenPipelineWithAllCached_whenRun_thenReturnCachedDataset() throws {
-        let s1 = SimpleServiceFactory.build(withId: 1, withFilterPercent: 0.5)
-        let s2 = SimpleServiceFactory.build(withId: 2, withFilterPercent: 0.5)
+        let s1 = RowFilterServiceFactory.build(withId: 1, withFilterPercent: 0.5)
+        let s2 = RowFilterServiceFactory.build(withId: 2, withFilterPercent: 0.5)
         let dataset = DatasetFactory.build(withDatasetSize: 100)
         let cachedDataset = DatasetFactory.build(withDatasetSize: 10)
         let pipeline = try PipelineFactory.build(withServices: [s1, s2])
@@ -85,8 +85,8 @@ public class PipelineTests: XCTestCase {
     }
 
     func testGivenPipelineWithQuantitativeMetric_whenRun_thenReturnStats() throws {
-        let s1 = SimpleServiceFactory.build(withId: 1, withFilterPercent: 0.5)
-        let s2 = SimpleServiceFactory.build(withId: 2, withFilterPercent: 0.5)
+        let s1 = RowFilterServiceFactory.build(withId: 1, withFilterPercent: 0.5)
+        let s2 = RowFilterServiceFactory.build(withId: 2, withFilterPercent: 0.5)
         let dataset = DatasetFactory.build(withDatasetSize: 100)
         let pipeline = try PipelineFactory.build(withServices: [s1, s2])
 

@@ -1,11 +1,11 @@
 import PythonKit
 
 class Pipeline {
-    let services: [SimpleService]
+    let services: [BaseService]
 
     let metricName: String
 
-    init(services: [SimpleService], metricName: String) throws {
+    init(services: [BaseService], metricName: String) throws {
         guard !services.isEmpty else {
             throw GenericErrors.InvalidState("Pipeline cannot run with 0 services")
         }
@@ -15,11 +15,11 @@ class Pipeline {
 
     public func run(
         on dataset: PythonObject, 
-        withCache cache: [([SimpleService], PythonObject)]? = nil
+        withCache cache: [([BaseService], PythonObject)]? = nil
     ) -> (output: PythonObject, statsCalculator: StatsCalculator) {
         let startingDataset: PythonObject
-        var previouslyChosenServices: [SimpleService]
-        let pipelineServices: [SimpleService]
+        var previouslyChosenServices: [BaseService]
+        let pipelineServices: [BaseService]
         var accumulatedFilteringSeed: [UInt8]
         if let cacheHit = searchForBestCacheHit(on: cache) {
             startingDataset = cacheHit.1
@@ -34,10 +34,10 @@ class Pipeline {
             accumulatedFilteringSeed = []
         }
 
-        let output = pipelineServices.reduce(startingDataset, { (res: PythonObject, current: SimpleService) -> PythonObject in
+        let output = pipelineServices.reduce(startingDataset, { (res: PythonObject, current: BaseService) -> PythonObject in
             let result = current.run(
                 on: res,
-                withContext: SimpleContext(
+                withContext: Context(
                     previouslyChosenServices: previouslyChosenServices,
                     accumulatedFilteringSeed: accumulatedFilteringSeed
                 )
@@ -60,9 +60,9 @@ class Pipeline {
     }
 
     private func searchForBestCacheHit(
-        on cache: [([SimpleService], PythonObject)]?
-    ) -> ([SimpleService], PythonObject)? {
-        var bestHit: ([SimpleService], PythonObject)? = nil
+        on cache: [([BaseService], PythonObject)]?
+    ) -> ([BaseService], PythonObject)? {
+        var bestHit: ([BaseService], PythonObject)? = nil
 
         for (cachedServices, cachedDataset) in (cache ?? []) {
             if cachedServices.isPrefix(of: services) {
