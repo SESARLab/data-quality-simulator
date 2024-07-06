@@ -6,22 +6,18 @@ def qualitative(df1, df2):
     ws = []
 
     for col in df1.columns:
-        try:
-            p = df1[col].value_counts(normalize=True).sort_index()
-            q = df2[col].value_counts(normalize=True).reindex(p.index, fill_value=0.0).sort_index()
-            if np.sum(np.asarray(q), axis=0, keepdims=True) != 0:
-                ds.append(distance.jensenshannon(p, q))
-                ws.append(len(df1[col].unique()) / len(df1[col]))
-            else:
-                ds.append(1.0)
-        except Exception as e:
-            print(e)
+        p = df1[col].value_counts(normalize=True)
+        q = df2[col].value_counts(normalize=True).reindex(p.index, fill_value=0.0)
+
+        if q.empty:
             ds.append(1.0)
-    ws = [w/sum(ws) for w in ws]
-    try:
-        return np.average(ds,weights=ws)
-    except:
-        return 1.0
+        else:
+            ds.append(distance.jensenshannon(p, q))
+        ws.append(df1[col].nunique() / df1[col].count())
+    weight_sum = sum(ws)
+    ws = [w/weight_sum for w in ws]
+
+    return np.average(ds,weights=ws)
     
 
 def quantitative(df1, df2):

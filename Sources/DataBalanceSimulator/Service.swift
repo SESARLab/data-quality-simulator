@@ -6,7 +6,7 @@ import Logging
 class BaseService: Equatable, CustomStringConvertible {
     var id: Int
 
-    let experimentSeed: Int
+    let serviceSeed: Int
 
     let filteringSeed: [UInt8]
 
@@ -22,9 +22,8 @@ class BaseService: Equatable, CustomStringConvertible {
         filterUpperBound: Double
     ) {
         self.id = id
-        self.experimentSeed = experimentSeed
-        let generatorSeed = id * experimentSeed
-        var randomGenerator = MTGenerator(seed: UInt32(generatorSeed))
+        self.serviceSeed = id * experimentSeed
+        var randomGenerator = RandomNumberGeneratorWithSeed(seed: serviceSeed)
         self.filteringSeed = Double.random(in: 0...1, using: &randomGenerator).bytes
         self.filterLowerBound = filterLowerBound
         self.filterUpperBound = filterUpperBound
@@ -43,7 +42,7 @@ class BaseService: Equatable, CustomStringConvertible {
     }
 
     private func generatePercent(usingHashFrom x: [UInt8]) -> Double {
-        let percent = Double(x.crc32()) / pow(2, 32)
+        let percent = Double(x.crc32()) / Double(UInt32.max)
         let normalizedPercent = percent.normalize(
             min: 0, 
             max: 1, 
@@ -98,21 +97,47 @@ class RowFilterService: BaseService {
     ///   - context: the execution context, which includes the previously executed services
     /// - Returns: the filtered dataframe
     override public func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject {
-        return dataframe.sample(
+        return PythonModulesStore.sampling.sample_rows(
+            df: dataframe,
             frac: self.finalFilteringPercent(from: context),
-            random_state: self.experimentSeed
+            random_state: self.serviceSeed 
         )
     }
 }
 
 class ColumnFilterService: BaseService {
-    /// Run the service and filter columns using the percent computed by finalFilteringPercent
+    let columnFrac: Double
+
+    init(id: Int,
+        experimentSeed: Int,
+        filterLowerBound: Double,
+        filterUpperBound: Double,
+        columnFrac: Double
+    ) {
+        self.columnFrac = columnFrac
+        super.init(id: id, 
+            experimentSeed: experimentSeed, 
+            filterLowerBound: filterLowerBound, 
+            filterUpperBound: filterUpperBound
+        )
+
+        logger.log(withDescription: " Creating Service \(id)", withProps: [
+            "filteringSeed" : "\(filteringSeed)"
+        ])
+    }
+
+    /// Run the service and filter exactly columns using the percent computed by finalFilteringPercent
     /// - Parameters:
     ///   - dataframe: Pandas dataframe containing the dataset
     ///   - context: the execution context, which includes the previously executed services
     /// - Returns: the filtered dataframe
     override public func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject {
-        return dataframe
+        return PythonModulesStore.sampling.sample_columns(
+            df: dataframe,
+            columns_frac: 0.8,
+            rows_frac: self.finalFilteringPercent(from: context),
+            random_state: self.serviceSeed 
+        )
     }
 
     override var description: String {

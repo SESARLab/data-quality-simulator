@@ -20,6 +20,11 @@ class PythonModulesStore {
         return Python.import("dataset")
     }()
 
+    static var sampling = {
+        configurePythonEnvIfNecessary()
+        return Python.import("sampling")
+    }()
+
     static var builtins = Python.import("builtins")
 
     public static func configurePythonEnv() {
