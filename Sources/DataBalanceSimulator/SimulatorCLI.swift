@@ -98,7 +98,7 @@ struct SimulatorCLI: ParsableCommand {
         
         logger.debug("Loading the dataset...")
         let dataset = PythonModulesStore.getAttr(
-            module: PythonModulesStore.dataset, 
+            obj: PythonModulesStore.dataset, 
             attr: configManager[.datasetName] as! String
         )()
         logger.debug("Dataset loaded ✅")

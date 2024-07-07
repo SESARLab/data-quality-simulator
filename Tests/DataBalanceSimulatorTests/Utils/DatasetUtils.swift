@@ -2,6 +2,7 @@ import PythonKit
 import Logging
 
 import XCTest
+@testable import DataBalanceSimulator
 
 public class DatasetUtils {
     public static func assertSizeIsSmaller(
@@ -16,5 +17,13 @@ public class DatasetUtils {
         isEqualTo size: Int
     ) {
         XCTAssertEqual(Int(df.size)!, size)
+    }
+
+    public static func assertCount(
+        ofSeries series: PythonObject,
+        isEqualTo count: Int
+    ) {
+        let countFn = PythonModulesStore.getAttr(obj: series, attr: "count")
+        XCTAssertEqual(Int(countFn())!, count)
     }
 }

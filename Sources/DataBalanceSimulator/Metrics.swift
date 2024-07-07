@@ -43,7 +43,7 @@ struct StatsCalculator {
         // })
 
         let metricCalculator = PythonModulesStore.getAttr(
-            module: PythonModulesStore.metrics, 
+            obj: PythonModulesStore.metrics, 
             attr: metricName
         )
         self.metricValue = Double(metricCalculator(df1: originalDataset, df2: filteredDataset))!

@@ -23,3 +23,17 @@ class RowFilterServiceFactory {
         }
     }
 }
+
+class ColumnFilterServiceFactory {
+    public static func build(withId id: Int = 1, withFilterPercent filterPercent: Double? = nil) -> ColumnFilterService {
+        let lowerBound = filterPercent ?? 0.5
+        let upperBound = filterPercent ?? 0.8
+        return ColumnFilterService(
+            id: id, 
+            experimentSeed: 10,
+            filterLowerBound: lowerBound, 
+            filterUpperBound: upperBound,
+            columnFrac: 0.5
+        )
+    }
+}

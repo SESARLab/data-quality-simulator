@@ -33,7 +33,7 @@ class PythonModulesStore {
         sys.path.append("\(os.getcwd())/python-modules")
     }
 
-    public static func getAttr(module: PythonObject, attr: String) -> PythonObject {
-        return builtins.getattr(module, attr)
+    public static func getAttr(obj: PythonObject, attr: String) -> PythonObject {
+        return builtins.getattr(obj, attr)
     }
 }

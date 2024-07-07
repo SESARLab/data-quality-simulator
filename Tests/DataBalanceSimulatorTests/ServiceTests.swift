@@ -1,8 +1,8 @@
 import XCTest
 @testable import DataBalanceSimulator
 
-public class SimpleServiceTests: XCTestCase {
-    func testGivenSimpleServiceAsFirst_whenRun_thenFilterDataset() throws {
+public class RowFilterServiceTests: XCTestCase {
+    func testGivenRowFilterServiceAsFirst_whenRun_thenFilterDataset() throws {
         let s = RowFilterServiceFactory.build(withFilterPercent: 0.5)
         let dataset = DatasetFactory.build(withDatasetSize: 100)
 
@@ -14,7 +14,7 @@ public class SimpleServiceTests: XCTestCase {
         DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 50)
     }
 
-    func testGivenSimpleServiceAsSecond_whenRun_thenFilterDataset() throws {
+    func testGivenRowFilterServiceAsSecond_whenRun_thenFilterDataset() throws {
         let s = RowFilterServiceFactory.build(withId: 1, withFilterPercent: 0.5)
         let prevService = RowFilterServiceFactory.build(withId: 2)
         let dataset = DatasetFactory.build(withDatasetSize: 100)
@@ -25,5 +25,34 @@ public class SimpleServiceTests: XCTestCase {
         ))
 
         DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 50)
+    }
+}
+
+public class ColumnFilterServiceTests: XCTestCase {
+    func testGivenColumnFilterServiceAsFirst_whenRun_thenFilterDataset() throws {
+        let s = ColumnFilterServiceFactory.build(withFilterPercent: 0.5)
+        let dataset = DatasetFactory.build(withDatasetSize: 100)
+
+        let filteredDataset = s.run(on: dataset, withContext: Context(
+            previouslyChosenServices: [],
+            accumulatedFilteringSeed: []
+        ))
+
+        DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 100)
+        DatasetUtils.assertCount(ofSeries: filteredDataset["field"], isEqualTo: 50)
+    }
+
+    func testGivenRowFilterServiceAsSecond_whenRun_thenFilterDataset() throws {
+        let s = ColumnFilterServiceFactory.build(withId: 1, withFilterPercent: 0.5)
+        let prevService = ColumnFilterServiceFactory.build(withId: 2)
+        let dataset = DatasetFactory.build(withDatasetSize: 100)
+
+        let filteredDataset = s.run(on: dataset, withContext: Context(
+            previouslyChosenServices: [prevService],
+            accumulatedFilteringSeed: prevService.filteringSeed
+        ))
+
+        DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 100)
+        DatasetUtils.assertCount(ofSeries: filteredDataset["field"], isEqualTo: 50)
     }
 }
