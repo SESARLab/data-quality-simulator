@@ -11,5 +11,8 @@ CREATE TABLE IF NOT EXISTS results (
     metric_value double,
     percentage double,
     lower_bound double,
-    upper_bound double
+    upper_bound double,
+    description text default ''
 );
+
+-- migration 1: ALTER TABLE results ADD COLUMN description TEXT DEFAULT '';

@@ -36,6 +36,14 @@ else
 	uid=$(uid) gid=$(gid) docker compose run --rm db
 endif
 
+migrate-db:
+ifdef IS_DEVCONTAINER
+	echo "Run this task from Host"
+	exit 1
+else
+	uid=$(uid) gid=$(gid) docker compose run --rm db sh -c "echo \"$(SQL_CODE)\" | sqlite3 simulations.db"
+endif
+
 run:
 	mkdir -p db/data notebooks
 ifdef IS_DEVCONTAINER

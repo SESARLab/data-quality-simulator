@@ -8,5 +8,6 @@
     "seed": 1,
     "metricName": "qualitative",
     "datasetName": "inmates_enriched_10k",
-    "dbPath": "./db/simulations.db"
+    "dbPath": "./db/simulations.db",
+    "description": "column and row filtering with column_frac=0.2"
 }

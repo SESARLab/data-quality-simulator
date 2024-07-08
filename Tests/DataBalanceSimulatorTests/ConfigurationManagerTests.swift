@@ -49,6 +49,7 @@ public class ConfigurationManagerTests: XCTestCase {
         )
 
         for prop in ConfigProperties.allCases {
+            XCTAssert(configs[prop] != nil)
             XCTAssertEqual(configs[prop]!.description, configManager[prop].description)
         }
     }

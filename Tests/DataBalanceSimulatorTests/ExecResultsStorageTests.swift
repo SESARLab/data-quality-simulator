@@ -54,7 +54,8 @@ public class ExecResultsStorageTests: XCTestCase {
             metricValue: 8.0, 
             percentage: 0.5, 
             lowerBound: 0.1, 
-            upperBound: 0.8
+            upperBound: 0.8,
+            description: "test"
         )
         let storage = try ExecResultsStorage(dbPath: dbPath)
 
@@ -75,5 +76,6 @@ public class ExecResultsStorageTests: XCTestCase {
         XCTAssertEqual(row[ExecResultsStorage.percentage], 0.5)
         XCTAssertEqual(row[ExecResultsStorage.lowerBound], 0.1)
         XCTAssertEqual(row[ExecResultsStorage.upperBound], 0.8)
+        XCTAssertEqual(row[ExecResultsStorage.description], "test")
     }
 }

@@ -54,6 +54,12 @@ struct SimulatorCLI: ParsableCommand {
     var dbPath: String?
 
     @Option(name: .long, help: """
+        The description of the simulation. It can be useful to distinguish two
+        simulations having the same parameters but with different implementations 
+        """)
+    var description: String?
+
+    @Option(name: .long, help: """
     Configuration file containing the same properties as the CLI in the Json format
     The CLI options can overwrite these configurations
     """)
@@ -107,11 +113,12 @@ struct SimulatorCLI: ParsableCommand {
         for servicesCount in servicesRange {
             for nodesCount in nodesRange {
                 let nodes = Array(1...nodesCount * servicesCount)
-                    .map { RowFilterService(
+                    .map { RowAndColumnFilterService(
                         id: $0,
                         experimentSeed: experimentSeed,
                         filterLowerBound: configManager[.lowerBound] as! Double, 
-                        filterUpperBound: configManager[.upperBound] as! Double
+                        filterUpperBound: configManager[.upperBound] as! Double,
+                        columnFrac: 0.2
                     ) }
                     .chunks(ofCount: servicesCount).map { Array($0) }
 
@@ -138,7 +145,8 @@ struct SimulatorCLI: ParsableCommand {
                         metricValue: simulationResults.metricValue, 
                         percentage: simulationResults.percentage, 
                         lowerBound: configManager[.lowerBound] as! Double, 
-                        upperBound: configManager[.upperBound] as! Double
+                        upperBound: configManager[.upperBound] as! Double,
+                        description: configManager[.description] as! String
                     ))
                     logger.debug("Insert of execution data successful ✅")
                 }
@@ -160,5 +168,6 @@ struct SimulatorCLI: ParsableCommand {
         let percentage: Double
         let lowerBound: Double
         let upperBound: Double
+        let description: String
     }
 }

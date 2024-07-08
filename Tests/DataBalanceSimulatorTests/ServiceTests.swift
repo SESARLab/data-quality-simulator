@@ -56,3 +56,18 @@ public class ColumnFilterServiceTests: XCTestCase {
         DatasetUtils.assertCount(ofSeries: filteredDataset["field"], isEqualTo: 50)
     }
 }
+
+public class RowAndColumnFilterServiceTests: XCTestCase {
+    func testGivenRowAndColumnFilterServiceAsFirst_whenRun_thenFilterDataset() throws {
+        let s = RowAndColumnFilterServiceFactory.build(withFilterPercent: 0.5)
+        let dataset = DatasetFactory.build(withDatasetSize: 100)
+
+        let filteredDataset = s.run(on: dataset, withContext: Context(
+            previouslyChosenServices: [],
+            accumulatedFilteringSeed: []
+        ))
+
+        DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 50)
+        DatasetUtils.assertCount(ofSeries: filteredDataset["field"], isEqualTo: 25)
+    }
+}

@@ -22,7 +22,7 @@ class BaseService: Equatable, CustomStringConvertible {
         filterUpperBound: Double
     ) {
         self.id = id
-        self.serviceSeed = id * experimentSeed
+        self.serviceSeed = id * experimentSeed * 5
         var randomGenerator = RandomNumberGeneratorWithSeed(seed: serviceSeed)
         self.filteringSeed = Double.random(in: 0...1, using: &randomGenerator).bytes
         self.filterLowerBound = filterLowerBound
@@ -80,7 +80,7 @@ class RowFilterService: BaseService {
             filterUpperBound: filterUpperBound
         )
 
-        logger.log(withDescription: " Creating Service \(id)", withProps: [
+        logger.log(withDescription: "Creating RF Service \(id)", withProps: [
             "filteringSeed" : "\(filteringSeed)"
         ])
     }
@@ -121,12 +121,12 @@ class ColumnFilterService: BaseService {
             filterUpperBound: filterUpperBound
         )
 
-        logger.log(withDescription: " Creating Service \(id)", withProps: [
+        logger.log(withDescription: "Creating CF Service \(id)", withProps: [
             "filteringSeed" : "\(filteringSeed)"
         ])
     }
 
-    /// Run the service and filter exactly columns using the percent computed by finalFilteringPercent
+    /// Run the service and filter columns (as many as column_frac) using the percent computed by finalFilteringPercent
     /// - Parameters:
     ///   - dataframe: Pandas dataframe containing the dataset
     ///   - context: the execution context, which includes the previously executed services
@@ -143,6 +143,56 @@ class ColumnFilterService: BaseService {
     override var description: String {
         get {
             return "CF" + super.description
+        }
+    }
+}
+
+class RowAndColumnFilterService: BaseService {
+    let rowFilterService: RowFilterService
+    let columnFilterService: ColumnFilterService
+
+    init(id: Int,
+        experimentSeed: Int,
+        filterLowerBound: Double,
+        filterUpperBound: Double,
+        columnFrac: Double
+    ) {
+        self.rowFilterService = RowFilterService(id: id,
+            experimentSeed: experimentSeed, 
+            filterLowerBound: filterLowerBound, 
+            filterUpperBound: filterUpperBound
+        )
+        self.columnFilterService = ColumnFilterService(id: id,
+            // TODO: the filteringSeed should change based on the type of service
+            experimentSeed: experimentSeed + 1, // + 1 to change the filteringSeed compared to the row filter
+            filterLowerBound: filterLowerBound, 
+            filterUpperBound: filterUpperBound,
+            columnFrac: columnFrac
+        )
+        super.init(id: id, 
+            experimentSeed: experimentSeed, 
+            filterLowerBound: filterLowerBound, 
+            filterUpperBound: filterUpperBound
+        )
+
+        logger.log(withDescription: "Creating RCF Service \(id)", withProps: [
+            "filteringSeed" : "\(filteringSeed)"
+        ])
+    }
+
+    /// combine the row and column filtering
+    /// - Parameters:
+    ///   - dataframe: Pandas dataframe containing the dataset
+    ///   - context: the execution context, which includes the previously executed services
+    /// - Returns: the filtered dataframe
+    override public func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject {
+        let modifiedDf =  self.rowFilterService.run(on: dataframe, withContext: context)
+        return self.columnFilterService.run(on: modifiedDf, withContext: context)
+    }
+
+    override var description: String {
+        get {
+            return "RCF" + super.description
         }
     }
 }

@@ -17,6 +17,7 @@ class ExecResultsStorage {
     static let percentage = Expression<Double>("percentage")
     static let lowerBound = Expression<Double>("lower_bound")
     static let upperBound = Expression<Double>("upper_bound")
+    static let description = Expression<String>("description")
 
     init(dbPath: String) throws {
         self.db = try Connection(dbPath)
@@ -36,7 +37,8 @@ class ExecResultsStorage {
             ExecResultsStorage.metricValue <- execResults.metricValue,
             ExecResultsStorage.percentage <- execResults.percentage,
             ExecResultsStorage.lowerBound <- execResults.lowerBound,
-            ExecResultsStorage.upperBound <- execResults.upperBound
+            ExecResultsStorage.upperBound <- execResults.upperBound,
+            ExecResultsStorage.description <- execResults.description
         ))
     }
 
