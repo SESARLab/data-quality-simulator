@@ -2,8 +2,14 @@ SHELL=/bin/bash
 uid=$(shell id -u)
 gid=$(shell id -g)
 SIMULATOR_LOGGER_LEVEL ?= info
+# external vars:
+# - CONFIG_FILE_PATH: configuration file path for the simulator
+# - SIMULATOR_ARGS: all the arguments for the simulator. it defaults to the $(CONFIG_FILE_PATH)
+# - IS_DEVCONTAINER: specifies that the execution environment is a container with all the 
+# 	necessary dependencies (like with devcontainer)
+# - SQL_CODE: when running the `migrate-db` task, it contains the sql code to execute
 
-.PHONY: build test run get-results count-results delete-all
+.PHONY: build test create-db migrate-db run open-notebook get-results count-results delete-all
 
 Package.resolved: Package.swift
 ifdef IS_DEVCONTAINER
@@ -49,11 +55,15 @@ run:
 ifdef IS_DEVCONTAINER
 	LOGGER_LEVEL=$(SIMULATOR_LOGGER_LEVEL) swift run DataBalanceSimulator \
 		--config-file-path=$(CONFIG_FILE_PATH) \
-		--db-path=./db/data/simulations.db
+		--db-path=./db/data/simulations.db \
+		$(SIMULATOR_ARGS)
 else
+	uid=$(uid) gid=$(gid) \
+		docker compose run --rm db
 	SIMULATOR_CONFIG_FILE_PATH=$(CONFIG_FILE_PATH) \
-	SIMULATOR_LOGGER_LEVEL=$(SIMULATOR_LOGGER_LEVEL) uid=$(uid) gid=$(gid) \
-		docker compose up --build db simulator
+	SIMULATOR_LOGGER_LEVEL=$(SIMULATOR_LOGGER_LEVEL) \
+	uid=$(uid) gid=$(gid) \
+		docker compose run --build --rm simulator $$(test -n "$(strip $(SIMULATOR_ARGS))" && echo "$(SIMULATOR_ARGS) --config-file-path=$(CONFIG_FILE_PATH)")
 endif
 
 open-notebook:
