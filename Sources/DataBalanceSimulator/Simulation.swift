@@ -93,6 +93,8 @@ class Simulation {
             let (filteredDataset, metrics) = pipelineForChosen.run(on: originalDataset, withCache: pipelineCache)
             pipelineCache = [(previouslyChosenServices, filteredDataset)]
             bestStats = metrics
+
+            self.logger.debug("Best combination for window \(window): \(bestServiceComb!.services)")
         }
 
         return bestStats!

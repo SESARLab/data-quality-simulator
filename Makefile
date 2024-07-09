@@ -47,7 +47,8 @@ endif
 run:
 	mkdir -p db/data notebooks
 ifdef IS_DEVCONTAINER
-	swift run DataBalanceSimulator --config-file-path=$(CONFIG_FILE_PATH) \
+	LOGGER_LEVEL=$(SIMULATOR_LOGGER_LEVEL) swift run DataBalanceSimulator \
+		--config-file-path=$(CONFIG_FILE_PATH) \
 		--db-path=./db/data/simulations.db
 else
 	SIMULATOR_CONFIG_FILE_PATH=$(CONFIG_FILE_PATH) \
