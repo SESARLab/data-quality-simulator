@@ -27,7 +27,7 @@ public class SimulationTests: XCTestCase {
 
         let result = try sim.run(on: dataset)
 
-        XCTAssertEqual(result.metricValue, 0.25)
+        XCTAssertEqual(result.metricValue, 4.0)
         XCTAssertEqual(result.percentage, 0.25)
     }
 
@@ -43,7 +43,7 @@ public class SimulationTests: XCTestCase {
 
         let result = try sim.run(on: dataset)
 
-        XCTAssertEqual(result.metricValue, 0.125)
+        XCTAssertEqual(result.metricValue, 8.0)
         XCTAssertEqual(result.percentage, 0.125)
     }
 
@@ -59,7 +59,7 @@ public class SimulationTests: XCTestCase {
 
         let result = try sim.run(on: dataset)
 
-        XCTAssertEqual(result.metricValue, 0.25)
+        XCTAssertEqual(result.metricValue, 4.0)
         XCTAssertEqual(result.percentage, 0.25)
     }
 }

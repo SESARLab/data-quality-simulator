@@ -93,6 +93,6 @@ public class PipelineTests: XCTestCase {
         let result = pipeline.run(on: dataset)
 
         XCTAssertEqual(result.statsCalculator.filteredPercent, 0.25)
-        XCTAssertEqual(result.statsCalculator.metricValue, 0.25)
+        XCTAssertEqual(result.statsCalculator.metricValue, 4.0)
     }
 }

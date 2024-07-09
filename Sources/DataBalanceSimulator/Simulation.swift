@@ -73,7 +73,7 @@ class Simulation {
                 let pipelineExecution = pipeline.run(on: originalDataset, withCache: pipelineCache)
 
                 if let unwrappedBestComb = bestServiceComb {
-                    if pipelineExecution.statsCalculator.metricValue > unwrappedBestComb.stats.metricValue {
+                    if pipelineExecution.statsCalculator.metricValue < unwrappedBestComb.stats.metricValue {
                         bestServiceComb = (services: servicesCombination, stats: pipelineExecution.statsCalculator)
                     }
                 } 

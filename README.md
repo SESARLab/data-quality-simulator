@@ -26,4 +26,10 @@ To set the logger level, create an env variable called `LOGGER_LEVEL` with one o
 
 ---
 
+### DB Migrations
+
+For DB changes, run `make migrate-db SQL_CODE="your_migration_sql"`
+
+---
+
 [Deepnote experiments](https://deepnote.com/workspace/test-efaa-1feb6c70-6750-4e6b-8afd-854661b4e01a/project/Dataset-generation-17111468-e773-4c18-b5d3-b951c564e2bc/notebook/a0b70c155f2e4a4db16548fdf4ff4ddf)

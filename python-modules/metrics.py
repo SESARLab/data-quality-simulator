@@ -1,6 +1,10 @@
 from scipy.spatial import distance
 import numpy as np
 
+# **********************❗❗❗❗❗❗**********************
+# Note: lower metric values are considered better
+# *********************************************************
+
 # qualitative without none
 # def qualitative(df1, df2):
 #     ds = []
@@ -42,4 +46,4 @@ def qualitative(df1, df2):
     return np.average(ds,weights=ws)
 
 def quantitative(df1, df2):
-    return len(df2)/len(df1)
+    return len(df1)/len(df2)
