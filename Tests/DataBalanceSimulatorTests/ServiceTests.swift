@@ -11,6 +11,7 @@ public class RowFilterServiceTests: XCTestCase {
             accumulatedFilteringSeed: []
         ))
 
+        DatasetUtils.assertSizeWithoutNone(of: dataset, isEqualTo: 100)
         DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 100)
         DatasetUtils.assertSizeWithoutNone(of: filteredDataset, isEqualTo: 50)
     }
@@ -25,6 +26,7 @@ public class RowFilterServiceTests: XCTestCase {
             accumulatedFilteringSeed: prevService.filteringSeed
         ))
 
+        DatasetUtils.assertSizeWithoutNone(of: dataset, isEqualTo: 100)
         DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 100)
         DatasetUtils.assertSizeWithoutNone(of: filteredDataset, isEqualTo: 50)
         
@@ -41,6 +43,7 @@ public class ColumnFilterServiceTests: XCTestCase {
             accumulatedFilteringSeed: []
         ))
 
+        DatasetUtils.assertSizeWithoutNone(of: dataset, isEqualTo: 100)
         DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 100)
         DatasetUtils.assertCount(ofSeries: filteredDataset["field"], isEqualTo: 50)
     }
@@ -55,6 +58,7 @@ public class ColumnFilterServiceTests: XCTestCase {
             accumulatedFilteringSeed: prevService.filteringSeed
         ))
 
+        DatasetUtils.assertSizeWithoutNone(of: dataset, isEqualTo: 100)
         DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 100)
         DatasetUtils.assertCount(ofSeries: filteredDataset["field"], isEqualTo: 50)
     }
@@ -70,6 +74,7 @@ public class RowAndColumnFilterServiceTests: XCTestCase {
             accumulatedFilteringSeed: []
         ))
 
+        DatasetUtils.assertSizeWithoutNone(of: dataset, isEqualTo: 100)
         DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 100)
         DatasetUtils.assertSizeWithoutNone(of: filteredDataset, satisfy: { $0 < 50 && $0 >= 25 })
     }

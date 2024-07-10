@@ -31,7 +31,10 @@ class BaseService: Equatable, CustomStringConvertible {
         self.logger = Logger.createWithLevelFromEnv(fileName: #file)
     }
 
-    func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject {
+    func run(on dataframe: PythonObject, 
+        withContext context: Context, 
+        inPlace: Bool = false
+    ) -> PythonObject {
         assertionFailure("This method should be never called on the base class")
         return dataframe
     }
@@ -97,11 +100,15 @@ class RowFilterService: BaseService {
     ///   - dataframe: Pandas dataframe containing the dataset
     ///   - context: the execution context, which includes the previously executed services
     /// - Returns: the filtered dataframe
-    override public func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject {
+    override public func run(on dataframe: PythonObject, 
+        withContext context: Context, 
+        inPlace: Bool = false
+    ) -> PythonObject {
         return PythonModulesStore.sampling.sample_rows(
             df: dataframe,
             frac: self.finalFilteringPercent(from: context),
-            random_state: self.serviceSeed 
+            random_state: self.serviceSeed,
+            in_place: inPlace
         )
     }
 }
@@ -132,12 +139,16 @@ class ColumnFilterService: BaseService {
     ///   - dataframe: Pandas dataframe containing the dataset
     ///   - context: the execution context, which includes the previously executed services
     /// - Returns: the filtered dataframe
-    override public func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject {
+    override public func run(on dataframe: PythonObject, 
+        withContext context: Context, 
+        inPlace: Bool = false
+    ) -> PythonObject {
         return PythonModulesStore.sampling.sample_columns(
             df: dataframe,
             columns_frac: self.columnFrac,
             rows_frac: self.finalFilteringPercent(from: context),
-            random_state: self.serviceSeed 
+            random_state: self.serviceSeed,
+            in_place: inPlace
         )
     }
 
@@ -185,9 +196,20 @@ class RowAndColumnFilterService: BaseService {
     ///   - dataframe: Pandas dataframe containing the dataset
     ///   - context: the execution context, which includes the previously executed services
     /// - Returns: the filtered dataframe
-    override public func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject {
-        let modifiedDf =  self.rowFilterService.run(on: dataframe, withContext: context)
-        return self.columnFilterService.run(on: modifiedDf, withContext: context)
+    override public func run(on dataframe: PythonObject, 
+        withContext context: Context, 
+        inPlace: Bool = false
+    ) -> PythonObject {
+        let modifiedDf =  self.rowFilterService.run(
+            on: dataframe, 
+            withContext: context, 
+            inPlace: inPlace
+        )
+        return self.columnFilterService.run(
+            on: modifiedDf,
+            withContext: context,
+            inPlace: true
+        )
     }
 
     override var description: String {
