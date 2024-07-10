@@ -7,7 +7,7 @@
     "lowerBound": 0.1,
     "seed": 1,
     "metricName": "qualitative",
-    "datasetName": "inmates_enriched_10k",
+    "datasetName": "high_variability_10k",
     "dbPath": "./db/simulations.db",
     "description": "column and row filtering (assigning none to filtered) with column_frac=0.8"
 }
