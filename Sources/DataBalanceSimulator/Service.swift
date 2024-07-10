@@ -22,7 +22,8 @@ class BaseService: Equatable, CustomStringConvertible {
         filterUpperBound: Double
     ) {
         self.id = id
-        self.serviceSeed = id * experimentSeed * 5
+        // TODO: Instead of class name length you could use the sum of the ascii codes % 2^8
+        self.serviceSeed = id + ((experimentSeed + 1) << 16) + (String(describing: type(of: self)).count << 8)
         var randomGenerator = RandomNumberGeneratorWithSeed(seed: serviceSeed)
         self.filteringSeed = Double.random(in: 0...1, using: &randomGenerator).bytes
         self.filterLowerBound = filterLowerBound
@@ -134,7 +135,7 @@ class ColumnFilterService: BaseService {
     override public func run(on dataframe: PythonObject, withContext context: Context) -> PythonObject {
         return PythonModulesStore.sampling.sample_columns(
             df: dataframe,
-            columns_frac: 0.8,
+            columns_frac: self.columnFrac,
             rows_frac: self.finalFilteringPercent(from: context),
             random_state: self.serviceSeed 
         )
@@ -163,8 +164,7 @@ class RowAndColumnFilterService: BaseService {
             filterUpperBound: filterUpperBound
         )
         self.columnFilterService = ColumnFilterService(id: id,
-            // TODO: the filteringSeed should change based on the type of service
-            experimentSeed: experimentSeed + 1, // + 1 to change the filteringSeed compared to the row filter
+            experimentSeed: experimentSeed,
             filterLowerBound: filterLowerBound, 
             filterUpperBound: filterUpperBound,
             columnFrac: columnFrac

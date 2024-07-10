@@ -118,7 +118,7 @@ struct SimulatorCLI: ParsableCommand {
                         experimentSeed: experimentSeed,
                         filterLowerBound: configManager[.lowerBound] as! Double, 
                         filterUpperBound: configManager[.upperBound] as! Double,
-                        columnFrac: 0.2
+                        columnFrac: 0.8
                     ) }
                     .chunks(ofCount: servicesCount).map { Array($0) }
 

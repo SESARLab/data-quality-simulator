@@ -45,5 +45,6 @@ def qualitative(df1, df2):
 
     return np.average(ds,weights=ws)
 
+
 def quantitative(df1, df2):
     return len(df1)/len(df2)
