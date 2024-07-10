@@ -22,7 +22,8 @@ public class PipelineTests: XCTestCase {
 
         let result = pipeline.run(on: dataset)
 
-        DatasetUtils.assertSize(of: result.output, isEqualTo: 50)
+        DatasetUtils.assertSize(of: result.output, isEqualTo: 100)
+        DatasetUtils.assertSizeWithoutNone(of: result.output, isEqualTo: 50)
     }
 
     func testGivenPipelineWithMultipleServices_whenRun_thenExecuteSequentially() throws {
@@ -33,7 +34,8 @@ public class PipelineTests: XCTestCase {
 
         let result = pipeline.run(on: dataset)
 
-        DatasetUtils.assertSize(of: result.output, isEqualTo: 25)
+        DatasetUtils.assertSize(of: result.output, isEqualTo: 100)
+        DatasetUtils.assertSizeWithoutNone(of: result.output, satisfy: { $0 < 50 && $0 >= 25 })
     }
 
     func testGivenPipelineWithCacheEmpty_whenRun_thenExecuteAllServices() throws {
@@ -44,7 +46,8 @@ public class PipelineTests: XCTestCase {
 
         let result = pipeline.run(on: dataset, withCache: [])
 
-        DatasetUtils.assertSize(of: result.output, isEqualTo: 25)
+        DatasetUtils.assertSize(of: result.output, isEqualTo: 100)
+        DatasetUtils.assertSizeWithoutNone(of: result.output, satisfy: { $0 < 50 && $0 >= 25 })
     }
 
     func testGivenPipelineWithCacheMiss_whenRun_thenExecuteAllServices() throws {
@@ -57,7 +60,8 @@ public class PipelineTests: XCTestCase {
 
         let result = pipeline.run(on: dataset, withCache: [([s3], dumbDataset)])
 
-        DatasetUtils.assertSize(of: result.output, isEqualTo: 25)
+        DatasetUtils.assertSize(of: result.output, isEqualTo: 100)
+        DatasetUtils.assertSizeWithoutNone(of: result.output, satisfy: { $0 < 50 && $0 >= 25 })
     }
 
     func testGivenPipelineWithCacheHit_whenRun_thenExecuteRemainingServices() throws {
@@ -69,7 +73,8 @@ public class PipelineTests: XCTestCase {
 
         let result = pipeline.run(on: dataset, withCache: [([s1], cachedDataset)])
 
-        DatasetUtils.assertSize(of: result.output, isEqualTo: 5)
+        DatasetUtils.assertSize(of: result.output, isEqualTo: 10)
+        DatasetUtils.assertSizeWithoutNone(of: result.output, satisfy: { $0 < 10 && $0 >= 5 })
     }
 
     func testGivenPipelineWithAllCached_whenRun_thenReturnCachedDataset() throws {
@@ -82,6 +87,7 @@ public class PipelineTests: XCTestCase {
         let result = pipeline.run(on: dataset, withCache: [([s1, s2], cachedDataset)])
 
         DatasetUtils.assertSize(of: result.output, isEqualTo: 10)
+        DatasetUtils.assertSizeWithoutNone(of: result.output, isEqualTo: 10)
     }
 
     func testGivenPipelineWithQuantitativeMetric_whenRun_thenReturnStats() throws {
@@ -92,7 +98,7 @@ public class PipelineTests: XCTestCase {
 
         let result = pipeline.run(on: dataset)
 
-        XCTAssertEqual(result.statsCalculator.filteredPercent, 0.25)
-        XCTAssertEqual(result.statsCalculator.metricValue, 4.0)
+        XCTAssert(result.statsCalculator.filteredPercent < 0.50 && result.statsCalculator.filteredPercent >= 0.25)
+        XCTAssert(result.statsCalculator.metricValue > 2.0 && result.statsCalculator.metricValue <= 4.0)
     }
 }

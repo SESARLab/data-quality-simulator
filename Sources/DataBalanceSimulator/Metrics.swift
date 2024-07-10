@@ -28,7 +28,7 @@ struct StatsCalculator {
         self.metricName = metricName
         self.pipeline = pipeline
 
-        self.filteredPercent = Double(filteredDataset.count) / Double(originalDataset.count)
+        self.filteredPercent = Double(filteredDataset.dropna().shape[0])! / Double(originalDataset.dropna().shape[0])!
         // TODO: the next commented section is the old way to compute the filteredPercent
         // var accumulatedFilteringSeed: [UInt8] = []
         // var previousServices: [SimpleService] = []

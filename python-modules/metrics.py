@@ -47,4 +47,4 @@ def qualitative(df1, df2):
 
 
 def quantitative(df1, df2):
-    return len(df1)/len(df2)
+    return df1.dropna().shape[0] / df2.dropna().shape[0]

@@ -15,8 +15,9 @@ class RowFilterServiceFactory {
     public static func buildGroups(withFilterPercents filterPercents: [Double]...) -> [[RowFilterService]] {
         return Array(0..<filterPercents.count).map { groupIndex in
             Array(0..<filterPercents[groupIndex].count).map { elemIndex in
-                RowFilterServiceFactory.build(
-                    withId: groupIndex * elemIndex, 
+                let serviceId = (groupIndex * filterPercents[groupIndex].count) + elemIndex
+                return RowFilterServiceFactory.build(
+                    withId: serviceId, 
                     withFilterPercent: filterPercents[groupIndex][elemIndex]
                 )
             }

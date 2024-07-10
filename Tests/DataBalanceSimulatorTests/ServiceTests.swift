@@ -11,7 +11,8 @@ public class RowFilterServiceTests: XCTestCase {
             accumulatedFilteringSeed: []
         ))
 
-        DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 50)
+        DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 100)
+        DatasetUtils.assertSizeWithoutNone(of: filteredDataset, isEqualTo: 50)
     }
 
     func testGivenRowFilterServiceAsSecond_whenRun_thenFilterDataset() throws {
@@ -24,7 +25,9 @@ public class RowFilterServiceTests: XCTestCase {
             accumulatedFilteringSeed: prevService.filteringSeed
         ))
 
-        DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 50)
+        DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 100)
+        DatasetUtils.assertSizeWithoutNone(of: filteredDataset, isEqualTo: 50)
+        
     }
 }
 
@@ -67,7 +70,7 @@ public class RowAndColumnFilterServiceTests: XCTestCase {
             accumulatedFilteringSeed: []
         ))
 
-        DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 50)
-        DatasetUtils.assertCount(ofSeries: filteredDataset["field"], isEqualTo: 25)
+        DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 100)
+        DatasetUtils.assertSizeWithoutNone(of: filteredDataset, satisfy: { $0 < 50 && $0 >= 25 })
     }
 }

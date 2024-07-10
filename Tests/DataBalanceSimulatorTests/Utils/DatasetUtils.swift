@@ -16,7 +16,23 @@ public class DatasetUtils {
         of df: PythonObject,
         isEqualTo size: Int
     ) {
-        XCTAssertEqual(Int(df.size)!, size)
+        XCTAssertEqual(Int(df.shape[0])!, size)
+    }
+
+    public static func assertSizeWithoutNone(
+        of df: PythonObject,
+        isEqualTo size: Int
+    ) {
+        let df_no_none = df.dropna()
+        XCTAssertEqual(Int(df_no_none.shape[0])!, size)
+    }
+
+    public static func assertSizeWithoutNone(
+        of df: PythonObject,
+        satisfy condition: (Int) -> Bool
+    ) {
+        let df_no_none = df.dropna()
+        XCTAssert(condition(Int(df_no_none.shape[0])!))
     }
 
     public static func assertCount(
