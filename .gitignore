@@ -3,3 +3,4 @@ test_files/
 __pycache__/
 db/data/
 notebooks/.ipynb_checkpoints/
+notebooks/*.png
