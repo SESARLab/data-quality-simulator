@@ -58,12 +58,19 @@ ifdef IS_DEVCONTAINER
 		--db-path=./db/data/simulations.db \
 		$(SIMULATOR_ARGS)
 else
-	uid=$(uid) gid=$(gid) \
-		docker compose run --rm db
-	SIMULATOR_CONFIG_FILE_PATH=$(CONFIG_FILE_PATH) \
-	SIMULATOR_LOGGER_LEVEL=$(SIMULATOR_LOGGER_LEVEL) \
-	uid=$(uid) gid=$(gid) \
-		docker compose run --build --rm simulator $$(test -n "$(strip $(SIMULATOR_ARGS))" && echo "$(SIMULATOR_ARGS) --config-file-path=$(CONFIG_FILE_PATH)")
+	uid=$(uid) gid=$(gid) docker compose run --rm db
+	test -n "$(strip $(subst ",\",$(SIMULATOR_ARGS)))" \
+	&& \
+		SIMULATOR_CONFIG_FILE_PATH=$(CONFIG_FILE_PATH) \
+		SIMULATOR_LOGGER_LEVEL=$(SIMULATOR_LOGGER_LEVEL) \
+		uid=$(uid) gid=$(gid) \
+			docker compose run --build --rm simulator $(SIMULATOR_ARGS) --config-file-path=$(CONFIG_FILE_PATH) \
+	|| \
+		SIMULATOR_CONFIG_FILE_PATH=$(CONFIG_FILE_PATH) \
+		SIMULATOR_LOGGER_LEVEL=$(SIMULATOR_LOGGER_LEVEL) \
+		uid=$(uid) gid=$(gid) \
+			docker compose run --build --rm simulator
+
 endif
 
 open-notebook:
