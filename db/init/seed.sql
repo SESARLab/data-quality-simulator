@@ -12,7 +12,10 @@ CREATE TABLE IF NOT EXISTS results (
     percentage double,
     lower_bound double,
     upper_bound double,
-    description text default ''
+    description text default '',
+    filtering_type text default 'mixed'
 );
 
 -- migration 1: ALTER TABLE results ADD COLUMN description TEXT DEFAULT '';
+
+-- migration 2: ALTER TABLE results ADD COLUMN filtering_type TEXT DEFAULT 'mixed';

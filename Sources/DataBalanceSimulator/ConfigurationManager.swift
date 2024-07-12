@@ -10,6 +10,20 @@ enum ConfigsValidationErrors: Error, Equatable {
     )
 }
 
+enum FilteringType: String, LosslessStringConvertible {
+    case row
+    case column
+    case mixed
+
+    var description: String {
+        return self.rawValue
+    }
+
+    init?(_ description: String) {
+        self.init(rawValue: description)
+    }
+}
+
 enum ConfigProperties: String, CaseIterable {
     case seed
     case minNodes
@@ -22,20 +36,22 @@ enum ConfigProperties: String, CaseIterable {
     case datasetName
     case dbPath
     case description
+    case filteringType
 
-    func isTypeCompatibleWith(value: LosslessStringConvertible) -> Bool {
+    func castToActualType(value: LosslessStringConvertible) -> LosslessStringConvertible? {
         switch self {
-            case .seed: return Int("\(value)") != nil
-            case .minNodes: return Int("\(value)") != nil
-            case .maxNodes: return Int("\(value)") != nil
-            case .minServices: return Int("\(value)") != nil
-            case .maxServices: return Int("\(value)") != nil
-            case .lowerBound: return Double("\(value)") != nil
-            case .upperBound: return Double("\(value)") != nil
-            case .metricName: return value is String
-            case .datasetName: return value is String
-            case .dbPath: return value is String
-            case .description: return value is String
+            case .seed: return Int("\(value)")
+            case .minNodes: return Int("\(value)")
+            case .maxNodes: return Int("\(value)")
+            case .minServices: return Int("\(value)")
+            case .maxServices: return Int("\(value)")
+            case .lowerBound: return Double("\(value)")
+            case .upperBound: return Double("\(value)")
+            case .metricName: return value
+            case .datasetName: return value
+            case .dbPath: return value
+            case .description: return value
+            case .filteringType: return FilteringType(rawValue: "\(value)")
         }
     }
 }
@@ -62,9 +78,11 @@ class ConfigurationManager {
         precondition(configs.count == ConfigProperties.allCases.count)
 
         for prop in ConfigProperties.allCases {
-            guard prop.isTypeCompatibleWith(value: self.configs[prop]!) else {
+            guard let castProp = prop.castToActualType(value: self.configs[prop]!) else {
                 throw ConfigsValidationErrors.ConfigPropertyTypeIsNotCompliant(property: prop)
             }
+
+            configs[prop] = castProp
         }
     }
 
@@ -136,6 +154,7 @@ class ConfigurationManager {
                     case .datasetName: String(describing: value)
                     case .dbPath: String(describing: value)
                     case .description: String(describing: value)
+                    case .filteringType: String(describing: value)
                 }
 
                 if castValue != nil {

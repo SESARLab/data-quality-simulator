@@ -9,5 +9,6 @@
     "metricName": "qualitative",
     "datasetName": "high_variability_10k",
     "dbPath": "./db/simulations.db",
-    "description": "column and row filtering (assigning none to filtered) with column_frac=0.8"
+    "description": "column and row filtering (assigning none to filtered) with column_frac=0.8",
+    "filteringType": "mixed"
 }

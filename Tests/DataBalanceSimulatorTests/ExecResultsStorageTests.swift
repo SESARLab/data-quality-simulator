@@ -55,7 +55,8 @@ public class ExecResultsStorageTests: XCTestCase {
             percentage: 0.5, 
             lowerBound: 0.1, 
             upperBound: 0.8,
-            description: "test"
+            description: "test",
+            filteringType: .mixed
         )
         let storage = try ExecResultsStorage(dbPath: dbPath)
 

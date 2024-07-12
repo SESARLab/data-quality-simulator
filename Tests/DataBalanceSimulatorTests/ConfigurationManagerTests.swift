@@ -145,7 +145,8 @@ public class ConfigurationManagerTests: XCTestCase {
     }
     
     func testGivenConfigsFromCli_whenPropertyHasWrongType_thenThrow() throws {
-        for prop in ConfigProperties.allCases {
+        let alwaysValidProps: Set<ConfigProperties> = Set([.datasetName, .metricName, .dbPath, .description])
+        for prop in ConfigProperties.allCases.filter ({ !alwaysValidProps.contains($0)}) {
             var configs = SimulatorConfigsFactory.build()
             configs[prop] = NotExistingType("does-not-exist")
 

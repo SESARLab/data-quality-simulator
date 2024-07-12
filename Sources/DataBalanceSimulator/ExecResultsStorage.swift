@@ -18,6 +18,7 @@ class ExecResultsStorage {
     static let lowerBound = Expression<Double>("lower_bound")
     static let upperBound = Expression<Double>("upper_bound")
     static let description = Expression<String>("description")
+    static let filteringType = Expression<String>("filtering_type")
 
     init(dbPath: String) throws {
         self.db = try Connection(dbPath)
@@ -38,7 +39,8 @@ class ExecResultsStorage {
             ExecResultsStorage.percentage <- execResults.percentage,
             ExecResultsStorage.lowerBound <- execResults.lowerBound,
             ExecResultsStorage.upperBound <- execResults.upperBound,
-            ExecResultsStorage.description <- execResults.description
+            ExecResultsStorage.description <- execResults.description,
+            ExecResultsStorage.filteringType <- execResults.filteringType.rawValue
         ))
     }
 

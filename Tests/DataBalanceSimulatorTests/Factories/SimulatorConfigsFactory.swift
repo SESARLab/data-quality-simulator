@@ -3,17 +3,18 @@
 class SimulatorConfigsFactory {
     public static func build() -> [ConfigProperties: LosslessStringConvertible] {
         return [
-            ConfigProperties.seed: 1, 
-            ConfigProperties.minNodes: 2,
-            ConfigProperties.maxNodes: 3,
-            ConfigProperties.minServices: 2, 
-            ConfigProperties.maxServices: 3, 
-            ConfigProperties.lowerBound: 0.1, 
-            ConfigProperties.upperBound: 1.0,
-            ConfigProperties.metricName: "qualitative",
-            ConfigProperties.datasetName: "mydataset",
-            ConfigProperties.dbPath: "mydb",
-            .description: "test"
+            .seed: 1, 
+            .minNodes: 2,
+            .maxNodes: 3,
+            .minServices: 2, 
+            .maxServices: 3, 
+            .lowerBound: 0.1, 
+            .upperBound: 1.0,
+            .metricName: "qualitative",
+            .datasetName: "mydataset",
+            .dbPath: "mydb",
+            .description: "test",
+            .filteringType: "row"
         ]
     }
 }

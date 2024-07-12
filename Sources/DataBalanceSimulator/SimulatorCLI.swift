@@ -60,6 +60,12 @@ struct SimulatorCLI: ParsableCommand {
     var description: String?
 
     @Option(name: .long, help: """
+        It specified the filtering type of all services (e.g. only filter rows,
+        only filter columns)
+        """)
+    var filteringType: String?
+
+    @Option(name: .long, help: """
     Configuration file containing the same properties as the CLI in the Json format
     The CLI options can overwrite these configurations
     """)
@@ -78,7 +84,9 @@ struct SimulatorCLI: ParsableCommand {
             .upperBound: upperBound,
             .metricName: metricName,
             .datasetName: datasetName,
-            .dbPath: dbPath
+            .dbPath: dbPath,
+            .filteringType: filteringType,
+            .description: description 
         ], configFilePathOpt: configFilePath)
         logger.log(withDescription: "Starting simulator", withProps: [
             "seed": "\(configManager[.seed])",
@@ -90,7 +98,9 @@ struct SimulatorCLI: ParsableCommand {
             "upperBound": "\(configManager[.upperBound])",
             "metricName": "\(configManager[.metricName])",
             "datasetName": "\(configManager[.datasetName])",
-            "dbPath": "\(configManager[.dbPath])"
+            "dbPath": "\(configManager[.dbPath])",
+            "filteringType": "\(configManager[.filteringType])",
+            "description": "\(configManager[.description])",
         ])
 
         logger.debug("Connecting to the database...")
@@ -109,16 +119,12 @@ struct SimulatorCLI: ParsableCommand {
         )()
         logger.debug("Dataset loaded ✅")
 
-        let experimentSeed = configManager[.seed] as! Int
         for servicesCount in servicesRange {
             for nodesCount in nodesRange {
                 let nodes = Array(1...nodesCount * servicesCount)
-                    .map { RowAndColumnFilterService(
-                        id: $0,
-                        experimentSeed: experimentSeed,
-                        filterLowerBound: configManager[.lowerBound] as! Double, 
-                        filterUpperBound: configManager[.upperBound] as! Double,
-                        columnFrac: 0.8
+                    .map { createService(
+                        withId: $0, 
+                        usingConfigsFrom: configManager
                     ) }
                     .chunks(ofCount: servicesCount).map { Array($0) }
 
@@ -146,11 +152,41 @@ struct SimulatorCLI: ParsableCommand {
                         percentage: simulationResults.percentage, 
                         lowerBound: configManager[.lowerBound] as! Double, 
                         upperBound: configManager[.upperBound] as! Double,
-                        description: configManager[.description] as! String
+                        description: configManager[.description] as! String,
+                        filteringType: configManager[.filteringType] as! FilteringType
                     ))
                     logger.debug("Insert of execution data successful ✅")
                 }
             }
+        }
+    }
+
+    private func createService(
+        withId id: Int,
+        usingConfigsFrom configManager: ConfigurationManager
+    ) -> BaseService {
+        let filteringType = configManager[.filteringType] as! FilteringType
+        switch filteringType {
+            case .row: return RowFilterService(
+                id: id,
+                experimentSeed: configManager[.seed] as! Int,
+                filterLowerBound: configManager[.lowerBound] as! Double, 
+                filterUpperBound: configManager[.upperBound] as! Double
+            )
+            case .column: return ColumnFilterService(
+                id: id,
+                experimentSeed: configManager[.seed] as! Int,
+                filterLowerBound: configManager[.lowerBound] as! Double, 
+                filterUpperBound: configManager[.upperBound] as! Double,
+                columnFrac: 0.8
+            )
+            case .mixed: return RowAndColumnFilterService(
+                id: id,
+                experimentSeed: configManager[.seed] as! Int,
+                filterLowerBound: configManager[.lowerBound] as! Double, 
+                filterUpperBound: configManager[.upperBound] as! Double,
+                columnFrac: 0.8
+            )
         }
     }
 
@@ -169,5 +205,6 @@ struct SimulatorCLI: ParsableCommand {
         let lowerBound: Double
         let upperBound: Double
         let description: String
+        let filteringType: FilteringType
     }
 }
