@@ -7,9 +7,9 @@ SIMULATOR_LOGGER_LEVEL ?= info
 # - SIMULATOR_ARGS: all the arguments for the simulator. it defaults to the $(CONFIG_FILE_PATH)
 # - IS_DEVCONTAINER: specifies that the execution environment is a container with all the 
 # 	necessary dependencies (like with devcontainer)
-# - SQL_CODE: when running the `migrate-db` task, it contains the sql code to execute
+# - SQL_CODE: when running the `migrate-db` or `run-query` task, it contains the sql code to execute
 
-.PHONY: build test create-db migrate-db run open-notebook get-results count-results delete-all
+.PHONY: build test create-db migrate-db run open-notebook get-results count-results delete-all run-query
 
 Package.resolved: Package.swift
 ifdef IS_DEVCONTAINER
@@ -92,3 +92,6 @@ count-results:
 
 delete-all:
 	uid=$(uid) gid=$(gid) docker compose run --rm delete-all
+
+run-query:
+	uid=$(uid) gid=$(gid) SQL_CODE="$(SQL_CODE)" docker compose run --rm run-query

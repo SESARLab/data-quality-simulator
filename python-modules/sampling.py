@@ -62,7 +62,8 @@ def sample_columns(df: pd.DataFrame,
         categories_to_filter = rng.choice(column_categories, categories_to_filter_count, replace=False)
 
         for category in categories_to_filter:
-            indexes_to_none = df_with_categories[column].loc[lambda x: x == category].index
+            category_column = df_with_categories[column]
+            indexes_to_none = category_column[category_column == category].index
             new_df.loc[indexes_to_none, column] = None
 
     return new_df

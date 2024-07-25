@@ -91,3 +91,16 @@ services:
         "-c",
         "echo \"delete from results;\" | sqlite3 simulations.db"
       ]
+
+  run-query:
+    image: keinos/sqlite3:3.46.0
+    working_dir: /db
+    user: "${uid:-1000}:${gid:-1000}"
+    volumes:
+      - ./db/data:/db
+    command:
+      [
+        "sh",
+        "-c",
+        "echo \"${SQL_CODE}\" | sqlite3 simulations.db"
+      ]
