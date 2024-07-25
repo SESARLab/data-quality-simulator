@@ -2,13 +2,13 @@
 
 class RowFilterServiceFactory {
     public static func build(withId id: Int = 1, withFilterPercent filterPercent: Double? = nil) -> RowFilterService {
-        let lowerBound = filterPercent ?? 0.5
-        let upperBound = filterPercent ?? 0.8
+        let rowLowerBound = filterPercent ?? 0.5
+        let rowUpperBound = filterPercent ?? 0.8
         return RowFilterService(
             id: id, 
             experimentSeed: 10,
-            filterLowerBound: lowerBound, 
-            filterUpperBound: upperBound
+            rowLowerBound: rowLowerBound, 
+            rowUpperBound: rowUpperBound
         )
     }
 
@@ -26,29 +26,41 @@ class RowFilterServiceFactory {
 }
 
 class ColumnFilterServiceFactory {
-    public static func build(withId id: Int = 1, withFilterPercent filterPercent: Double? = nil) -> ColumnFilterService {
-        let lowerBound = filterPercent ?? 0.5
-        let upperBound = filterPercent ?? 0.8
+    public static func build(withId id: Int = 1, 
+        withRowSamplingPercent rowSamplingPercent: Double? = nil,
+        withColumnSamplingPercent columnSamplingPercent: Double? = nil
+    ) -> ColumnFilterService {
+        let rowLowerBound = rowSamplingPercent ?? 0.5
+        let rowUpperBound = rowSamplingPercent ?? 0.8
+        let columnLowerBound = columnSamplingPercent ?? 0.5
+        let columnUpperBound = columnSamplingPercent ?? 0.8
         return ColumnFilterService(
             id: id, 
             experimentSeed: 10,
-            filterLowerBound: lowerBound, 
-            filterUpperBound: upperBound,
-            columnFrac: 0.5
+            rowLowerBound: rowLowerBound, 
+            rowUpperBound: rowUpperBound,
+            columnLowerBound: columnLowerBound, 
+            columnUpperBound: columnUpperBound
         )
     }
 }
 
 class RowAndColumnFilterServiceFactory {
-    public static func build(withId id: Int = 1, withFilterPercent filterPercent: Double? = nil) -> RowAndColumnFilterService {
-        let lowerBound = filterPercent ?? 0.5
-        let upperBound = filterPercent ?? 0.8
+    public static func build(withId id: Int = 1, 
+        withRowSamplingPercent rowSamplingPercent: Double? = nil,
+        withColumnSamplingPercent columnSamplingPercent: Double? = nil
+    ) -> RowAndColumnFilterService {
+        let rowLowerBound = rowSamplingPercent ?? 0.5
+        let rowUpperBound = rowSamplingPercent ?? 0.8
+        let columnLowerBound = columnSamplingPercent ?? 0.5
+        let columnUpperBound = columnSamplingPercent ?? 0.8
         return RowAndColumnFilterService(
             id: id, 
             experimentSeed: 10,
-            filterLowerBound: lowerBound, 
-            filterUpperBound: upperBound,
-            columnFrac: 0.5
+            rowLowerBound: rowLowerBound, 
+            rowUpperBound: rowUpperBound,
+            columnLowerBound: columnLowerBound, 
+            columnUpperBound: columnUpperBound
         )
     }
 }

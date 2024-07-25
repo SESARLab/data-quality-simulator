@@ -30,8 +30,10 @@ enum ConfigProperties: String, CaseIterable {
     case maxNodes
     case minServices
     case maxServices
-    case lowerBound
-    case upperBound
+    case rowLowerBound
+    case rowUpperBound
+    case columnLowerBound
+    case columnUpperBound
     case metricName
     case datasetName
     case dbPath
@@ -45,8 +47,10 @@ enum ConfigProperties: String, CaseIterable {
             case .maxNodes: return Int("\(value)")
             case .minServices: return Int("\(value)")
             case .maxServices: return Int("\(value)")
-            case .lowerBound: return Double("\(value)")
-            case .upperBound: return Double("\(value)")
+            case .rowLowerBound: return Double("\(value)")
+            case .rowUpperBound: return Double("\(value)")
+            case .columnLowerBound: return Double("\(value)")
+            case .columnUpperBound: return Double("\(value)")
             case .metricName: return value
             case .datasetName: return value
             case .dbPath: return value
@@ -148,8 +152,10 @@ class ConfigurationManager {
                     case .maxNodes: Int("\(value)")
                     case .minServices: Int("\(value)")
                     case .maxServices: Int("\(value)")
-                    case .lowerBound: Double("\(value)")
-                    case .upperBound: Double("\(value)")
+                    case .rowLowerBound: Double("\(value)")
+                    case .rowUpperBound: Double("\(value)")
+                    case .columnLowerBound: Double("\(value)")
+                    case .columnUpperBound: Double("\(value)")
                     case .metricName: String(describing: value)
                     case .datasetName: String(describing: value)
                     case .dbPath: String(describing: value)

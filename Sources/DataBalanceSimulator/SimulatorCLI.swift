@@ -1,5 +1,5 @@
 import ArgumentParser
-// import Rainbow
+import PythonKit
 import Logging
 import Algorithms
 import Foundation
@@ -26,16 +26,28 @@ struct SimulatorCLI: ParsableCommand {
     var maxServices: Int?
 
     @Option(name: .long, help: """
-        Percentage of the minimum amount of data removed after a
+        Percentage of the minimum number of rows/categories removed after a
         service execution. Its range is [0, 1]
         """)
-    var lowerBound: Double?
+    var rowLowerBound: Double?
 
     @Option(name: .long, help: """
-        Percentage of the maximum amount of data removed after a
+        Percentage of the maximum number of rows/categories removed after a
         service execution. Its range is [0, 1]
         """)
-    var upperBound: Double?
+    var rowUpperBound: Double?
+
+    @Option(name: .long, help: """
+        Percentage of the minimum number of column removed after a
+        service execution. Its range is [0, 1]
+        """)
+    var columnLowerBound: Double?
+
+    @Option(name: .long, help: """
+        Percentage of the maximum number of column removed after a
+        service execution. Its range is [0, 1]
+        """)
+    var columnUpperBound: Double?
 
     @Option(name: .long, help: """
         The metric used to evaluate the best combination of services in the pipeline
@@ -80,8 +92,10 @@ struct SimulatorCLI: ParsableCommand {
             .maxNodes: maxNodes,
             .minServices: minServices,
             .maxServices: maxServices,
-            .lowerBound: lowerBound,
-            .upperBound: upperBound,
+            .rowLowerBound: rowLowerBound,
+            .rowUpperBound: rowUpperBound,
+            .columnLowerBound: columnLowerBound,
+            .columnUpperBound: columnUpperBound,
             .metricName: metricName,
             .datasetName: datasetName,
             .dbPath: dbPath,
@@ -94,8 +108,10 @@ struct SimulatorCLI: ParsableCommand {
             "maxNodes": "\(configManager[.maxNodes])",
             "minServices": "\(configManager[.minServices])",
             "maxServices": "\(configManager[.maxServices])",
-            "lowerBound": "\(configManager[.lowerBound])",
-            "upperBound": "\(configManager[.upperBound])",
+            "rowLowerBound": "\(configManager[.rowLowerBound])",
+            "rowUpperBound": "\(configManager[.rowUpperBound])",
+            "columnLowerBound": "\(configManager[.columnLowerBound])",
+            "columnUpperBound": "\(configManager[.columnUpperBound])",
             "metricName": "\(configManager[.metricName])",
             "datasetName": "\(configManager[.datasetName])",
             "dbPath": "\(configManager[.dbPath])",
@@ -119,13 +135,16 @@ struct SimulatorCLI: ParsableCommand {
         )()
         logger.debug("Dataset loaded ✅")
 
-        for servicesCount in servicesRange {
-            for nodesCount in nodesRange {
-                let nodes = Array(1...nodesCount * servicesCount)
+        let allServices = Array(1...(configManager[.maxNodes] as! Int) * (configManager[.maxServices] as! Int))
                     .map { createService(
                         withId: $0, 
                         usingConfigsFrom: configManager
                     ) }
+        
+        for servicesCount in servicesRange {
+            for nodesCount in nodesRange {
+                // TODO: avoid re-creation of services everytime
+                let nodes = allServices.prefix(nodesCount * servicesCount)
                     .chunks(ofCount: servicesCount).map { Array($0) }
 
                 for windowSize in 1...nodesCount {
@@ -150,8 +169,10 @@ struct SimulatorCLI: ParsableCommand {
                         metricName: configManager[.metricName] as! String,
                         metricValue: simulationResults.metricValue, 
                         percentage: simulationResults.percentage, 
-                        lowerBound: configManager[.lowerBound] as! Double, 
-                        upperBound: configManager[.upperBound] as! Double,
+                        rowLowerBound: configManager[.rowLowerBound] as! Double, 
+                        rowUpperBound: configManager[.rowUpperBound] as! Double,
+                        columnLowerBound: configManager[.columnLowerBound] as! Double, 
+                        columnUpperBound: configManager[.columnUpperBound] as! Double,
                         description: configManager[.description] as! String,
                         filteringType: configManager[.filteringType] as! FilteringType
                     ))
@@ -170,22 +191,24 @@ struct SimulatorCLI: ParsableCommand {
             case .row: return RowFilterService(
                 id: id,
                 experimentSeed: configManager[.seed] as! Int,
-                filterLowerBound: configManager[.lowerBound] as! Double, 
-                filterUpperBound: configManager[.upperBound] as! Double
+                rowLowerBound: configManager[.rowLowerBound] as! Double, 
+                rowUpperBound: configManager[.rowUpperBound] as! Double
             )
             case .column: return ColumnFilterService(
                 id: id,
                 experimentSeed: configManager[.seed] as! Int,
-                filterLowerBound: configManager[.lowerBound] as! Double, 
-                filterUpperBound: configManager[.upperBound] as! Double,
-                columnFrac: 0.8
+                rowLowerBound: configManager[.rowLowerBound] as! Double, 
+                rowUpperBound: configManager[.rowUpperBound] as! Double,
+                columnLowerBound: configManager[.columnLowerBound] as! Double, 
+                columnUpperBound: configManager[.columnUpperBound] as! Double
             )
             case .mixed: return RowAndColumnFilterService(
                 id: id,
                 experimentSeed: configManager[.seed] as! Int,
-                filterLowerBound: configManager[.lowerBound] as! Double, 
-                filterUpperBound: configManager[.upperBound] as! Double,
-                columnFrac: 0.8
+                rowLowerBound: configManager[.rowLowerBound] as! Double, 
+                rowUpperBound: configManager[.rowUpperBound] as! Double,
+                columnLowerBound: configManager[.columnLowerBound] as! Double, 
+                columnUpperBound: configManager[.columnUpperBound] as! Double
             )
         }
     }
@@ -202,8 +225,10 @@ struct SimulatorCLI: ParsableCommand {
         let metricName: String
         let metricValue: Double
         let percentage: Double
-        let lowerBound: Double
-        let upperBound: Double
+        let rowLowerBound: Double
+        let rowUpperBound: Double
+        let columnLowerBound: Double
+        let columnUpperBound: Double
         let description: String
         let filteringType: FilteringType
     }

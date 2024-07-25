@@ -53,8 +53,10 @@ public class ExecResultsStorageTests: XCTestCase {
             metricName: "metric1", 
             metricValue: 8.0, 
             percentage: 0.5, 
-            lowerBound: 0.1, 
-            upperBound: 0.8,
+            rowLowerBound: 0.1, 
+            rowUpperBound: 0.8,
+            columnLowerBound: 0.2, 
+            columnUpperBound: 0.7,
             description: "test",
             filteringType: .mixed
         )
@@ -75,8 +77,10 @@ public class ExecResultsStorageTests: XCTestCase {
         XCTAssertEqual(row[ExecResultsStorage.metricName], "metric1")
         XCTAssertEqual(row[ExecResultsStorage.metricValue], 8.0)
         XCTAssertEqual(row[ExecResultsStorage.percentage], 0.5)
-        XCTAssertEqual(row[ExecResultsStorage.lowerBound], 0.1)
-        XCTAssertEqual(row[ExecResultsStorage.upperBound], 0.8)
+        XCTAssertEqual(row[ExecResultsStorage.rowLowerBound], 0.1)
+        XCTAssertEqual(row[ExecResultsStorage.rowUpperBound], 0.8)
+        XCTAssertEqual(row[ExecResultsStorage.columnLowerBound], 0.2)
+        XCTAssertEqual(row[ExecResultsStorage.columnUpperBound], 0.7)
         XCTAssertEqual(row[ExecResultsStorage.description], "test")
     }
 }

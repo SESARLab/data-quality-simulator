@@ -1,5 +1,11 @@
 import pandas as pd
 import numpy as np
+import xxhash
+
+# import warnings
+
+# # Treat all RuntimeWarnings as errors
+# warnings.filterwarnings('error', category=RuntimeWarning)
 
 # sample eliminates the rows, instead I want to None them
 # return df.sample(
@@ -54,7 +60,6 @@ def sample_columns(df: pd.DataFrame,
         column_categories = df_with_categories[column].dtype.categories
         categories_to_filter_count = max(1, int(len(column_categories) * (1 - cat_frac)))
         categories_to_filter = rng.choice(column_categories, categories_to_filter_count, replace=False)
-        print(categories_to_filter)
 
         for category in categories_to_filter:
             indexes_to_none = df_with_categories[column].loc[lambda x: x == category].index
@@ -77,16 +82,19 @@ def create_categories(column: pd.Series, rng: np.random.Generator) -> pd.Series:
         max_categories_count = len(column.unique())
         categories_count = 1 if max_categories_count == 1 else \
             rng.integers(2, min(max_categories_count, np.sqrt(len(column))), size=1, endpoint=True)[0]
-        values_range = column.max() - column.min()
-        precision = len(str(categories_count)) + (0 if values_range > 0 else \
-            len(str(int(1 // values_range))))
-        return pd.cut(column, bins=categories_count, precision=precision, include_lowest=True)
+        # compute the maximum number of decimal digits in a column by splitting on the decimal point
+        # and subtract the number of digits before the decimal point
+        max_decimal_digits = column.map(lambda x: len(str(x)) - len(str(x).split('.')[0])).max()
+        # subtract 1 because it max_decimal_digits includes the decimal point character
+        max_decimal_digits = max_decimal_digits - 1 if max_decimal_digits >= 2 else max_decimal_digits
+        precision = len(str(categories_count)) + max_decimal_digits
+        return pd.cut(column, bins=categories_count, precision=precision.item(), include_lowest=True)
 
     if pd.api.types.is_bool_dtype(column):
         return pd.Categorical(column, categories=[False, True])
 
     #if pd.api.types.is_string_dtype(column):
-    column_hashes = column.map(lambda x: hash(x)) # TODO change hash function
+    column_hashes = column.map(lambda x: xxhash.xxh64_intdigest(x))
     max_categories_count = len(column_hashes.unique())
     categories_count = 1 if max_categories_count == 1 else rng.integers(2, max_categories_count, size=1, endpoint=True)[0]
     return pd.cut(column_hashes, bins=categories_count, precision=0, include_lowest=True)

@@ -33,6 +33,11 @@ class PythonModulesStore {
         sys.path.append("\(os.getcwd())/python-modules")
     }
 
+    public static func getPythonId(obj: PythonObject) -> String {
+        let idFn = builtins.id
+        return "\(idFn(obj))"
+    }
+
     public static func getAttr(obj: PythonObject, attr: String) -> PythonObject {
         return builtins.getattr(obj, attr)
     }

@@ -15,8 +15,10 @@ class ExecResultsStorage {
     static let metricName = Expression<String>("metric_name") 
     static let metricValue = Expression<Double>("metric_value")
     static let percentage = Expression<Double>("percentage")
-    static let lowerBound = Expression<Double>("lower_bound")
-    static let upperBound = Expression<Double>("upper_bound")
+    static let rowLowerBound = Expression<Double>("row_lower_bound")
+    static let rowUpperBound = Expression<Double>("row_upper_bound")
+    static let columnLowerBound = Expression<Double>("column_lower_bound")
+    static let columnUpperBound = Expression<Double>("column_upper_bound")
     static let description = Expression<String>("description")
     static let filteringType = Expression<String>("filtering_type")
 
@@ -37,8 +39,10 @@ class ExecResultsStorage {
             ExecResultsStorage.metricName <- execResults.metricName,
             ExecResultsStorage.metricValue <- execResults.metricValue,
             ExecResultsStorage.percentage <- execResults.percentage,
-            ExecResultsStorage.lowerBound <- execResults.lowerBound,
-            ExecResultsStorage.upperBound <- execResults.upperBound,
+            ExecResultsStorage.rowLowerBound <- execResults.rowLowerBound,
+            ExecResultsStorage.rowUpperBound <- execResults.rowUpperBound,
+            ExecResultsStorage.columnLowerBound <- execResults.columnLowerBound,
+            ExecResultsStorage.columnUpperBound <- execResults.columnUpperBound,
             ExecResultsStorage.description <- execResults.description,
             ExecResultsStorage.filteringType <- execResults.filteringType.rawValue
         ))

@@ -39,7 +39,8 @@ class Pipeline {
                 on: res,
                 withContext: Context(
                     previouslyChosenServices: previouslyChosenServices,
-                    accumulatedFilteringSeed: accumulatedFilteringSeed
+                    accumulatedFilteringSeed: accumulatedFilteringSeed,
+                    originalDataset: dataset
                 )
             )
             previouslyChosenServices.append(current)
