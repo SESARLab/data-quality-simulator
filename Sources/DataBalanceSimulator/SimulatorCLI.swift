@@ -119,21 +119,19 @@ struct SimulatorCLI: ParsableCommand {
             "description": "\(configManager[.description])",
         ])
 
-        logger.debug("Connecting to the database...")
         let execResultsStorage = try ExecResultsStorage(
             dbPath: configManager[.dbPath] as! String
         )
-        logger.debug("Connected to the database ✅")
 
         let nodesRange = (configManager[.minNodes] as! Int)...(configManager[.maxNodes] as! Int)
         let servicesRange = (configManager[.minServices] as! Int)...(configManager[.maxServices] as! Int)
         
-        logger.debug("Loading the dataset...")
+        logger.info("Loading the dataset...")
         let dataset = PythonModulesStore.getAttr(
             obj: PythonModulesStore.dataset, 
             attr: configManager[.datasetName] as! String
         )()
-        logger.debug("Dataset loaded ✅")
+        logger.info("Dataset loaded ✅")
 
         let allServices = Array(1...(configManager[.maxNodes] as! Int) * (configManager[.maxServices] as! Int))
                     .map { createService(
@@ -143,7 +141,6 @@ struct SimulatorCLI: ParsableCommand {
         
         for servicesCount in servicesRange {
             for nodesCount in nodesRange {
-                // TODO: avoid re-creation of services everytime
                 let nodes = allServices.prefix(nodesCount * servicesCount)
                     .chunks(ofCount: servicesCount).map { Array($0) }
 
@@ -156,7 +153,6 @@ struct SimulatorCLI: ParsableCommand {
 
                     let simulationResults = try sim.run(on: dataset)
 
-                    logger.debug("Insert of execution data into database...")
                     try execResultsStorage.insert(ExecutionResults(
                         executionTime: simulationResults.executionTime, 
                         experimentId: configManager[.seed] as! Int, 
@@ -176,7 +172,6 @@ struct SimulatorCLI: ParsableCommand {
                         description: configManager[.description] as! String,
                         filteringType: configManager[.filteringType] as! FilteringType
                     ))
-                    logger.debug("Insert of execution data successful ✅")
                 }
             }
         }

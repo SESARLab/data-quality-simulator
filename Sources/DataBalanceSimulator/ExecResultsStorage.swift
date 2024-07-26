@@ -1,8 +1,13 @@
 import SQLite
+import Foundation
+import Logging
 
 class ExecResultsStorage {
     let db: Connection
+    let logger: Logger
+
     static let table = Table("results")
+    static let CONN_ERROR_MAX_RETRIES = 8
 
     static let executionTime = Expression<Double>("execution_time")
     static let experimentId = Expression<Int>("experiment_id")
@@ -23,29 +28,52 @@ class ExecResultsStorage {
     static let filteringType = Expression<String>("filtering_type")
 
     init(dbPath: String) throws {
+        self.logger = Logger.createWithLevelFromEnv(fileName: #file)
+        logger.debug("Connecting to the database...")
         self.db = try Connection(dbPath)
+        logger.debug("Connected to the database ✅")
     }
 
     public func insert(_ execResults: SimulatorCLI.ExecutionResults) throws {
-        try self.db.run(ExecResultsStorage.table.insert(
-            ExecResultsStorage.executionTime <- execResults.executionTime,
-            ExecResultsStorage.experimentId <- execResults.experimentId,
-            ExecResultsStorage.windowSize <- execResults.windowSize,
-            ExecResultsStorage.maxNodes <- execResults.maxNodes,
-            ExecResultsStorage.nodesCount <- execResults.nodesCount,
-            ExecResultsStorage.maxServices <- execResults.maxServices,
-            ExecResultsStorage.servicesCount <- execResults.servicesCount,
-            ExecResultsStorage.dataset <- execResults.dataset,
-            ExecResultsStorage.metricName <- execResults.metricName,
-            ExecResultsStorage.metricValue <- execResults.metricValue,
-            ExecResultsStorage.percentage <- execResults.percentage,
-            ExecResultsStorage.rowLowerBound <- execResults.rowLowerBound,
-            ExecResultsStorage.rowUpperBound <- execResults.rowUpperBound,
-            ExecResultsStorage.columnLowerBound <- execResults.columnLowerBound,
-            ExecResultsStorage.columnUpperBound <- execResults.columnUpperBound,
-            ExecResultsStorage.description <- execResults.description,
-            ExecResultsStorage.filteringType <- execResults.filteringType.rawValue
-        ))
+        var retryDelay: Double = 0.5
+        for retryAttempt in 0..<ExecResultsStorage.CONN_ERROR_MAX_RETRIES {
+            do {
+                logger.info("Trying to insert execution results into database... (Attempt n. \(retryAttempt))")
+                try self.db.run(ExecResultsStorage.table.insert(
+                    ExecResultsStorage.executionTime <- execResults.executionTime,
+                    ExecResultsStorage.experimentId <- execResults.experimentId,
+                    ExecResultsStorage.windowSize <- execResults.windowSize,
+                    ExecResultsStorage.maxNodes <- execResults.maxNodes,
+                    ExecResultsStorage.nodesCount <- execResults.nodesCount,
+                    ExecResultsStorage.maxServices <- execResults.maxServices,
+                    ExecResultsStorage.servicesCount <- execResults.servicesCount,
+                    ExecResultsStorage.dataset <- execResults.dataset,
+                    ExecResultsStorage.metricName <- execResults.metricName,
+                    ExecResultsStorage.metricValue <- execResults.metricValue,
+                    ExecResultsStorage.percentage <- execResults.percentage,
+                    ExecResultsStorage.rowLowerBound <- execResults.rowLowerBound,
+                    ExecResultsStorage.rowUpperBound <- execResults.rowUpperBound,
+                    ExecResultsStorage.columnLowerBound <- execResults.columnLowerBound,
+                    ExecResultsStorage.columnUpperBound <- execResults.columnUpperBound,
+                    ExecResultsStorage.description <- execResults.description,
+                    ExecResultsStorage.filteringType <- execResults.filteringType.rawValue
+                ))
+                logger.info("Insert of execution results successful ✅")
+
+                return
+            }
+            catch {
+                logger.info("Insert of execution results failed ❌")
+                logger.info("Error: \(error.localizedDescription)")
+                logger.info("Retrying with exponential backoff...")
+                
+                let randomDelayFactor = Double.random(in: 0...1)
+                retryDelay = (retryDelay * 2) + randomDelayFactor
+                Thread.sleep(forTimeInterval: retryDelay)
+            }
+        }
+
+        throw GenericErrors.Timeout("Reached maximum retry attempts while inserting execution results into db")
     }
 
 }

@@ -34,7 +34,7 @@ extension Logger {
         return logger
     }
 
-    func log(withDescription description: String, withProps props: [String: String]) {
+    func log(withLevel level: Level = .info, withDescription description: String, withProps props: [String: String]) {
         guard !props.isEmpty else {
             return self.info("\(description)")
         }
@@ -50,6 +50,6 @@ extension Logger {
             }
         }
         
-        self.info("\(log)")
+        self.log(level: level, "\(log)")
     }
 }

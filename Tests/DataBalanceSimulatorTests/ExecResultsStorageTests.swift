@@ -40,47 +40,52 @@ public class ExecResultsStorageTests: XCTestCase {
         }
     }
 
+    private func assertRowContainsExecResults(row: Row, execResults: SimulatorCLI.ExecutionResults) {
+        XCTAssertEqual(row[ExecResultsStorage.executionTime], execResults.executionTime)
+        XCTAssertEqual(row[ExecResultsStorage.experimentId], execResults.experimentId)
+        XCTAssertEqual(row[ExecResultsStorage.windowSize], execResults.windowSize)
+        XCTAssertEqual(row[ExecResultsStorage.maxNodes], execResults.maxNodes)
+        XCTAssertEqual(row[ExecResultsStorage.nodesCount], execResults.nodesCount)
+        XCTAssertEqual(row[ExecResultsStorage.maxServices], execResults.maxServices)
+        XCTAssertEqual(row[ExecResultsStorage.servicesCount], execResults.servicesCount)
+        XCTAssertEqual(row[ExecResultsStorage.dataset], execResults.dataset)
+        XCTAssertEqual(row[ExecResultsStorage.metricName], execResults.metricName)
+        XCTAssertEqual(row[ExecResultsStorage.metricValue], execResults.metricValue)
+        XCTAssertEqual(row[ExecResultsStorage.percentage], execResults.percentage)
+        XCTAssertEqual(row[ExecResultsStorage.rowLowerBound], execResults.rowLowerBound)
+        XCTAssertEqual(row[ExecResultsStorage.rowUpperBound], execResults.rowUpperBound)
+        XCTAssertEqual(row[ExecResultsStorage.columnLowerBound], execResults.columnLowerBound)
+        XCTAssertEqual(row[ExecResultsStorage.columnUpperBound], execResults.columnUpperBound)
+        XCTAssertEqual(row[ExecResultsStorage.description], execResults.description)
+    }
+
     func testGivenExecutionResults_whenStore_thenInsertIntoDb() throws {
-        let execResults = SimulatorCLI.ExecutionResults(
-            executionTime: 1.0, 
-            experimentId: 2, 
-            windowSize: 3,
-            maxNodes: 4,
-            nodesCount: 5, 
-            maxServices: 6, 
-            servicesCount: 7, 
-            dataset: "dataset1", 
-            metricName: "metric1", 
-            metricValue: 8.0, 
-            percentage: 0.5, 
-            rowLowerBound: 0.1, 
-            rowUpperBound: 0.8,
-            columnLowerBound: 0.2, 
-            columnUpperBound: 0.7,
-            description: "test",
-            filteringType: .mixed
-        )
+        let execResults = ExecResultsFactory.build()
         let storage = try ExecResultsStorage(dbPath: dbPath)
 
         try storage.insert(execResults)
 
         XCTAssertEqual(try self.db!.scalar(ExecResultsStorage.table.count), 1)
         let row = Array(try db!.prepare(ExecResultsStorage.table))[0]
-        XCTAssertEqual(row[ExecResultsStorage.executionTime], 1.0)
-        XCTAssertEqual(row[ExecResultsStorage.experimentId], 2)
-        XCTAssertEqual(row[ExecResultsStorage.windowSize], 3)
-        XCTAssertEqual(row[ExecResultsStorage.maxNodes], 4)
-        XCTAssertEqual(row[ExecResultsStorage.nodesCount], 5)
-        XCTAssertEqual(row[ExecResultsStorage.maxServices], 6)
-        XCTAssertEqual(row[ExecResultsStorage.servicesCount], 7)
-        XCTAssertEqual(row[ExecResultsStorage.dataset], "dataset1")
-        XCTAssertEqual(row[ExecResultsStorage.metricName], "metric1")
-        XCTAssertEqual(row[ExecResultsStorage.metricValue], 8.0)
-        XCTAssertEqual(row[ExecResultsStorage.percentage], 0.5)
-        XCTAssertEqual(row[ExecResultsStorage.rowLowerBound], 0.1)
-        XCTAssertEqual(row[ExecResultsStorage.rowUpperBound], 0.8)
-        XCTAssertEqual(row[ExecResultsStorage.columnLowerBound], 0.2)
-        XCTAssertEqual(row[ExecResultsStorage.columnUpperBound], 0.7)
-        XCTAssertEqual(row[ExecResultsStorage.description], "test")
+        assertRowContainsExecResults(row: row, execResults: execResults)
+    }
+
+    func testGivenLockedDb_whenStoreExecResults_thenRetryUntilInsert() throws {
+        let execResults = ExecResultsFactory.build()
+        let storage = try ExecResultsStorage(dbPath: dbPath)
+        // lock the database: from https://stackoverflow.com/q/14272715/5587393
+        try self.db?.execute("PRAGMA locking_mode = EXCLUSIVE; BEGIN EXCLUSIVE;")
+        Thread.detachNewThread {
+            Thread.sleep(forTimeInterval: 5)
+            print("Unlocking db... 🔓")
+            try! self.db?.execute("COMMIT; PRAGMA locking_mode = NORMAL;SELECT * FROM results LIMIT 1;")
+            print("Db unlocked ✅")
+        }
+
+        try storage.insert(execResults)
+
+        XCTAssertEqual(try self.db!.scalar(ExecResultsStorage.table.count), 1)
+        let row = Array(try db!.prepare(ExecResultsStorage.table))[0]
+        assertRowContainsExecResults(row: row, execResults: execResults)
     }
 }
