@@ -4,3 +4,4 @@ __pycache__/
 db/data/
 notebooks/.ipynb_checkpoints/
 notebooks/*.png
+notebooks/*.svg

@@ -58,7 +58,6 @@ ifdef IS_DEVCONTAINER
 		--db-path=./db/data/simulations.db \
 		$(SIMULATOR_ARGS)
 else
-	uid=$(uid) gid=$(gid) docker compose run --rm db
 	test -n "$(strip $(subst ",\",$(SIMULATOR_ARGS)))" \
 	&& \
 		SIMULATOR_CONFIG_FILE_PATH=$(CONFIG_FILE_PATH) \
