@@ -30,6 +30,7 @@ enum ConfigProperties: String, CaseIterable {
     case maxNodes
     case minServices
     case maxServices
+    case maxWindowSize
     case rowLowerBound
     case rowUpperBound
     case columnLowerBound
@@ -47,6 +48,7 @@ enum ConfigProperties: String, CaseIterable {
             case .maxNodes: return Int("\(value)")
             case .minServices: return Int("\(value)")
             case .maxServices: return Int("\(value)")
+            case .maxWindowSize: return Int("\(value)")
             case .rowLowerBound: return Double("\(value)")
             case .rowUpperBound: return Double("\(value)")
             case .columnLowerBound: return Double("\(value)")
@@ -152,6 +154,7 @@ class ConfigurationManager {
                     case .maxNodes: Int("\(value)")
                     case .minServices: Int("\(value)")
                     case .maxServices: Int("\(value)")
+                    case .maxWindowSize: Int("\(value)")
                     case .rowLowerBound: Double("\(value)")
                     case .rowUpperBound: Double("\(value)")
                     case .columnLowerBound: Double("\(value)")

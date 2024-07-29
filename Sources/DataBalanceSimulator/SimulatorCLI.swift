@@ -25,6 +25,9 @@ struct SimulatorCLI: ParsableCommand {
     @Option(name: .long, help: "Maximum number of services")
     var maxServices: Int?
 
+    @Option(name: .long, help: "Maximum window size")
+    var maxWindowSize: Int?
+
     @Option(name: .long, help: """
         Percentage of the minimum number of rows/categories removed after a
         service execution. Its range is [0, 1]
@@ -92,6 +95,7 @@ struct SimulatorCLI: ParsableCommand {
             .maxNodes: maxNodes,
             .minServices: minServices,
             .maxServices: maxServices,
+            .maxWindowSize: maxWindowSize,
             .rowLowerBound: rowLowerBound,
             .rowUpperBound: rowUpperBound,
             .columnLowerBound: columnLowerBound,
@@ -108,6 +112,7 @@ struct SimulatorCLI: ParsableCommand {
             "maxNodes": "\(configManager[.maxNodes])",
             "minServices": "\(configManager[.minServices])",
             "maxServices": "\(configManager[.maxServices])",
+            "maxWindowSize": "\(configManager[.maxWindowSize])",
             "rowLowerBound": "\(configManager[.rowLowerBound])",
             "rowUpperBound": "\(configManager[.rowUpperBound])",
             "columnLowerBound": "\(configManager[.columnLowerBound])",
@@ -144,7 +149,7 @@ struct SimulatorCLI: ParsableCommand {
                 let nodes = allServices.prefix(nodesCount * servicesCount)
                     .chunks(ofCount: servicesCount).map { Array($0) }
 
-                for windowSize in 1...nodesCount {
+                for windowSize in 1...min(nodesCount, configManager[.maxWindowSize] as! Int) {
                     let sim = try Simulation(
                         nodes: nodes, 
                         windowSize: windowSize, 

@@ -4,6 +4,7 @@
     "maxServices": 3,
     "minNodes": 2,
     "maxNodes": 3,
+    "maxWindowSize": 3,
     "rowUpperBound": 1,
     "rowLowerBound": 0.1,
     "columnUpperBound": 1,
