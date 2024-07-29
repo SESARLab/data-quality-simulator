@@ -9,3 +9,7 @@ def high_variability_10k():
 def low_variability_10k():
     import pandas as pd
     return pd.read_csv("datasets/low_variability_10k.csv")
+
+def avocado():
+    import pandas as pd
+    return pd.read_csv('datasets/avocado.csv', index_col=[0])

@@ -64,4 +64,4 @@ COPY --from=build /src/.build/x86_64-unknown-linux-gnu/release/DataBalanceSimula
 
 ENTRYPOINT ["/app/DataBalanceSimulator"]
 
-CMD ["--config-file-path", "/app/config-files/inmates_enriched_10k.json"]
+CMD ["--config-file-path", "/app/config-files/base_config.json"]
