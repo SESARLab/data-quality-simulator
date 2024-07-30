@@ -12,7 +12,15 @@ def low_variability_10k():
 
 def avocado():
     import pandas as pd
-    return pd.read_csv('datasets/avocado.csv', index_col=[0])
+
+    df = pd.read_csv('datasets/avocado.csv', index_col=[0])
+
+    df['Date'] = df['Date'].astype('datetime64[ns]')
+    df['type'] = df['type'].astype('category')
+    df['year'] = df['year'].astype('category')
+    df['region'] = df['region'].astype('category')
+
+    return df
 
 def IBM_HR_Analytics_employee_attrition():
     import pandas as pd

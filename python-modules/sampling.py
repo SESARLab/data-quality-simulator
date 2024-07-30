@@ -74,13 +74,15 @@ def create_categories(column: pd.Series, rng: np.random.Generator) -> pd.Series:
     Creates bins having the same range of values and assign each value to the closest bin.
     returns a Series of Categoricals, where each category is a bin
     '''
+    print("Working on column: ", column.name)
+
     if pd.api.types.is_integer_dtype(column):
-        max_categories_count = len(column.unique())
+        max_categories_count = column.nunique()
         categories_count = 1 if max_categories_count == 1 else rng.integers(2, max_categories_count, size=1, endpoint=True)[0]
         return pd.cut(column, bins=categories_count, precision=0, include_lowest=True)
 
     if pd.api.types.is_float_dtype(column):
-        max_categories_count = len(column.unique())
+        max_categories_count = column.nunique()
         categories_count = 1 if max_categories_count == 1 else \
             rng.integers(2, min(max_categories_count, np.sqrt(len(column))), size=1, endpoint=True)[0]
         # compute the maximum number of decimal digits in a column by splitting on the decimal point
@@ -92,11 +94,19 @@ def create_categories(column: pd.Series, rng: np.random.Generator) -> pd.Series:
         return pd.cut(column, bins=categories_count, precision=precision.item(), include_lowest=True)
 
     if pd.api.types.is_bool_dtype(column):
-        return pd.Categorical(column, categories=[False, True])
+        return pd.Series(pd.Categorical(column, categories=[False, True]))
+
+    if pd.api.types.is_datetime64_any_dtype(column):
+        max_categories_count = column.nunique()
+        categories_count = 1 if max_categories_count == 1 else rng.integers(2, max_categories_count, size=1, endpoint=True)[0]
+        return pd.cut(column, bins=categories_count, precision=0, include_lowest=True)
+
+    if isinstance(column.dtype, pd.CategoricalDtype):
+        return pd.Series(pd.Categorical(column))
 
     #if pd.api.types.is_string_dtype(column):
     column_hashes = column.map(lambda x: xxhash.xxh64_intdigest(x))
-    max_categories_count = len(column_hashes.unique())
+    max_categories_count = column_hashes.nunique()
     categories_count = 1 if max_categories_count == 1 else rng.integers(2, max_categories_count, size=1, endpoint=True)[0]
     return pd.cut(column_hashes, bins=categories_count, precision=0, include_lowest=True)
     
