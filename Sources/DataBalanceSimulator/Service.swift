@@ -157,14 +157,14 @@ class ColumnFilterService: BaseService {
             categoricalDataset = self.categoricalDatasetsMap[originalDataframeId]!
         }
         else {
-            logger.debug("Building categorical DataFrame with id = \(originalDataframeId)...")
+            logger.debug("Service \(self.id) is building the Categorical DataFrame with id = \(originalDataframeId)...")
 
             let samplingModule = PythonModulesStore.sampling
             let createCategoricalDfFn = PythonModulesStore.getAttr(obj: samplingModule, attr: "create_categorical_df")
             categoricalDataset = createCategoricalDfFn(df: context.originalDataset, random_state: self.serviceSeed)
             self.categoricalDatasetsMap[originalDataframeId] = categoricalDataset
 
-            logger.debug("Categorical DataFrame with id = \(originalDataframeId) built ✅")
+            logger.debug("Service \(self.id) has built the Categorical DataFrame with id = \(originalDataframeId) ✅")
         }
 
         return PythonModulesStore.sampling.sample_columns(

@@ -26,9 +26,11 @@ To set the logger level, create an env variable called `LOGGER_LEVEL` with one o
 
 ---
 
-### DB Migrations
+### DB Migrations and DB queries
 
-For DB changes, run `make migrate-db SQL_CODE="your_migration_sql"`
+For DB migration, run `make migrate-db SQL_CODE="your_migration_sql"`.
+
+To run queries on DB, run `make run-query SQL_CODE="your_plain_sql"`.
 
 ---
 

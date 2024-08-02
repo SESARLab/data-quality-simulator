@@ -74,8 +74,6 @@ def create_categories(column: pd.Series, rng: np.random.Generator) -> pd.Series:
     Creates bins having the same range of values and assign each value to the closest bin.
     returns a Series of Categoricals, where each category is a bin
     '''
-    print("Working on column: ", column.name)
-
     if pd.api.types.is_integer_dtype(column):
         max_categories_count = column.nunique()
         categories_count = 1 if max_categories_count == 1 else rng.integers(2, max_categories_count, size=1, endpoint=True)[0]
