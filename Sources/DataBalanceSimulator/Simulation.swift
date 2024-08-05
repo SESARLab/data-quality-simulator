@@ -11,10 +11,13 @@ class Simulation {
 
     let logger: Logger
 
+    let timeMonitor: TimeMonitor
+
     init(
         nodes: [[BaseService]],
         windowSize: Int,
-        metricName: String
+        metricName: String,
+        timeMonitor: TimeMonitor
     ) throws {
         guard nodes.count >= windowSize else {
             throw GenericErrors.InvalidState("windowSize must be smaller than the number of nodes")
@@ -24,6 +27,7 @@ class Simulation {
         self.windowSize = windowSize
         self.metricName = metricName
         self.logger = Logger.createWithLevelFromEnv(fileName: #file)
+        self.timeMonitor = timeMonitor
     }
 
     public func run(on data: PythonObject) throws -> Result {
@@ -94,7 +98,11 @@ class Simulation {
             pipelineCache = [(previouslyChosenServices, filteredDataset)]
             bestStats = metrics
 
+            self.timeMonitor.completeWindow(
+                services: nodes[0].count, nodes: nodes.count, winSize: windowSize, 
+                isLastWindow: index == windows.count - 1)
             self.logger.debug("Best combination for window \(window): \(bestServiceComb!.services)")
+            self.logger.info("Simulator status - samplings processed: \(self.timeMonitor.getDoneSampling()), completion percent: \(timeMonitor.getCompletionPercent())%")
         }
 
         return bestStats!

@@ -20,6 +20,33 @@ If the environment already have Swift installed (e.g. when you are developing us
 make run IS_DEVCONTAINER=true CONFIG_FILE_PATH=config-files/base_config.json SIMULATOR_ARGS=[...]
 ```
 
+The number of simulations is determined by the execution parameters:
+
+$\sum_{s = MinServices}^{MaxServices} \sum_{n = MinNodes}^{MaxNodes} \sum_{w = 1}^{min(n, MaxWindowSize)} s^{w} * (n - w + 1) + n$
+
+An execution with:
+
+$
+    nodes = 5 \newline
+    services = 6 \newline
+    maxWindowSize = 4 \newline
+$
+
+Includes the following number of samplings:
+
+$
+    winSize = 1 \to
+    samplings = (6^{1}) * 5 + 5\newline
+    winSize = 2 \to
+    samplings = (6^{2}) * 4 + 5\newline
+    winSize = 3 \to
+    samplings = (6^{3}) * 3 + 5\newline
+    winSize = 4 \to
+    samplings = (6^{4}) * 2 + 5\newline
+$
+
+$6^{x}$ represents the number of combinations in a window, which is multiplied by the number of windows in a simulation. After we choose the service, it is executed and the resulting dataset is stored and cached. This is the meaning of $+ n$ (one service for each node).
+
 ### Logging
 
 To set the logger level, create an env variable called `LOGGER_LEVEL` with one of the following values: `trace, debug, info, notice, warning, error, critical` ( default is `info`). The alternative is to pass this variable to `make run`.

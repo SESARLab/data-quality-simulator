@@ -138,6 +138,15 @@ struct SimulatorCLI: ParsableCommand {
         )()
         logger.info("Dataset loaded ✅")
 
+        let timeMonitor = TimeMonitor(
+            minServices: configManager[.minServices] as! Int, 
+            maxServices: configManager[.maxServices] as! Int, 
+            minNodes: configManager[.minNodes] as! Int,
+            maxNodes: configManager[.maxNodes] as! Int, 
+            maxWindowSize: configManager[.maxWindowSize] as! Int
+        )
+        logger.info("N° of samplings expected: \(timeMonitor.totalSamplings)")
+
         let allServices = Array(1...(configManager[.maxNodes] as! Int) * (configManager[.maxServices] as! Int))
                     .map { createService(
                         withId: $0, 
@@ -153,7 +162,8 @@ struct SimulatorCLI: ParsableCommand {
                     let sim = try Simulation(
                         nodes: nodes, 
                         windowSize: windowSize, 
-                        metricName: configManager[.metricName] as! String
+                        metricName: configManager[.metricName] as! String,
+                        timeMonitor: timeMonitor
                     )
 
                     let simulationResults = try sim.run(on: dataset)
