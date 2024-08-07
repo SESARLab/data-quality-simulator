@@ -20,6 +20,10 @@ If the environment already have Swift installed (e.g. when you are developing us
 make run IS_DEVCONTAINER=true CONFIG_FILE_PATH=config-files/base_config.json SIMULATOR_ARGS=[...]
 ```
 
+---
+
+## Simulation Complexity
+
 The number of simulations is determined by the execution parameters:
 
 $\sum_{s = MinServices}^{MaxServices} \sum_{n = MinNodes}^{MaxNodes} \sum_{w = 1}^{min(n, MaxWindowSize)} s^{w} * (n - w + 1) + n$
@@ -47,13 +51,55 @@ $
 
 $6^{x}$ represents the number of combinations in a window, which is multiplied by the number of windows in a simulation. After we choose the service, it is executed and the resulting dataset is stored and cached. This is the meaning of $+ n$ (one service for each node).
 
-### Logging
+---
+
+## Datasets
+
+Datasets are located in the `datasets` folder. The following table describes the characteristics of each dataset:
+
+| Dataset | Average of Columns entropy | Variance of Columns entropy | Std Dev of Columns entropy |
+|---------|----------------------------|-----------------------------|----------------------------|
+| high_variability | 11.80 | 0.24 | 0.49 |
+| low_variability | 1.7 | 0.2 | 0.45 |
+| inmates_enriched_10k | 5.35 | 13.09 | 3.62 |
+| IBM_HR_Analytics_employee_attrition | 3.13 | 8.56 | 2.93 |
+| red_wine_quality | 5.61 | 2.01 | 1.42 |
+
+To compute the entropy of each column:
+
+```python
+import pandas as pd
+import numpy as np
+from typing import Dict
+
+dataset = pd.read_csv(dataset_name + ".csv")
+
+dataset_size = len(dataset)
+
+def get_column_frequency(column: pd.Series) -> pd.Series:
+    return column.value_counts()
+
+def get_column_probability(column: pd.Series) -> pd.Series:
+    return column.value_counts(normalize=True)
+
+def get_column_entropy(column: pd.Series) -> float:
+    column_probability = get_column_probability(column)
+    return -sum(column_probability * np.log2(column_probability))
+
+
+entropies = [get_column_entropy(dataset[column]) for column in dataset.columns ]
+print(f"{round(np.mean(entropies), 2)}, {round(np.var(entropies), 2)}, {round(np.std(entropies), 2)}")
+```
+
+---
+
+## Logging
 
 To set the logger level, create an env variable called `LOGGER_LEVEL` with one of the following values: `trace, debug, info, notice, warning, error, critical` ( default is `info`). The alternative is to pass this variable to `make run`.
 
 ---
 
-### DB Migrations and DB queries
+## DB Migrations and DB queries
 
 For DB migration, run `make migrate-db SQL_CODE="your_migration_sql"`.
 

@@ -15,12 +15,56 @@ def inmates_enriched_10k():
 
 def high_variability_10k():
     import pandas as pd
-    return pd.read_csv("datasets/high_variability_10k.csv")
+    import numpy as np
+
+    DATASET_SIZE = 10_000
+    RANDOM_SEED = 1
+
+    rng = np.random.default_rng(RANDOM_SEED)
+    categories_for_column = [
+        [''.join([f'{chr(ord("a") + rng.integers(0, 26))}' for c in range(3)]) for _ in range(DATASET_SIZE)],
+        list(range(DATASET_SIZE // 4)),
+        [''.join([f'{chr(ord("a") + rng.integers(0, 26))}' for c in range(4)]) for _ in range(DATASET_SIZE)],
+        list(range(DATASET_SIZE // 3)),
+        list(range(DATASET_SIZE // 2))
+    ]
+
+    columns_data = [rng.choice(x, size=DATASET_SIZE, replace=True) for x in categories_for_column]
+    schema = {
+        'col_0': 'string',
+        'col_1': 'int16',
+        'col_2': 'string',
+        'col_3': 'int16',
+        'col_4': 'int16'
+    }
+    return pd.DataFrame({ f'col_{i}':col_data for i, col_data in enumerate(columns_data)}).astype(schema)
 
 
 def low_variability_10k():
     import pandas as pd
-    return pd.read_csv("datasets/low_variability_10k.csv")
+    import numpy as np
+
+    DATASET_SIZE = 10_000
+    RANDOM_SEED = 1
+
+    rng = np.random.default_rng(RANDOM_SEED)
+    categories_for_column = [
+        ['it', 'sp', 'gr'],
+        list(range(3)),
+        [True, False],
+        ['r', 'g', 'b', 'y'],
+        list(range(1, 6))
+    ]
+
+    columns_data = [rng.choice(x, size=DATASET_SIZE, replace=True) for x in categories_for_column]
+    schema = {
+            'col_0': 'category',
+            'col_1': 'category',
+            'col_2': 'boolean',
+            'col_3': 'category',
+            'col_4': 'category'
+        }
+    return pd.DataFrame({ f'col_{i}':col_data for i, col_data in enumerate(columns_data)}).astype(schema)
 
 
 def avocado():
