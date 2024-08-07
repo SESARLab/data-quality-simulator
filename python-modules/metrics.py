@@ -47,4 +47,8 @@ def qualitative(df1, df2):
 
 
 def quantitative(df1, df2):
-    return df1.dropna().shape[0] / df2.dropna().shape[0]
+    # df2 is the filtered dataset
+    df2_non_none_cells = df2.count().sum()
+    total_cells = df2.shape[0] * df2.shape[1]
+
+    return 1 - df2_non_none_cells / total_cells
