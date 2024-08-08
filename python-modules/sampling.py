@@ -12,15 +12,27 @@ import xxhash
 #     frac=frac,
 #     random_state=random_state
 # )
-def sample_rows(df: pd.DataFrame, 
+def sample_rows(df: pd.DataFrame,
+                df_with_categories: pd.DataFrame,
                 frac: float, 
                 random_state: int, 
                 in_place: bool) -> pd.DataFrame:
+    '''
+    pick {1 - frac}% of categories in a random column and None the corresponding rows
+    '''
     new_df = df if in_place else df.copy()
     rng = np.random.default_rng(random_state)
-    none_rows_size = int(len(new_df) * (1 - frac))
-    random_indices = rng.choice(new_df.index, none_rows_size, replace=False)
-    new_df.loc[random_indices, :] = None
+
+    # the rows of the categories to none are extracted from this column
+    target_column = rng.choice(new_df.columns, size=1, replace=False)[0]
+    category_column = df_with_categories[target_column]
+    column_categories = category_column.dtype.categories
+    categories_to_filter_count = max(1, int(len(column_categories) * (1 - frac)))
+    categories_to_filter = rng.choice(column_categories, categories_to_filter_count, replace=False)
+
+    indexes_to_none = category_column[category_column.isin(categories_to_filter)].index
+
+    new_df.loc[indexes_to_none, :] = None
 
     return new_df
 

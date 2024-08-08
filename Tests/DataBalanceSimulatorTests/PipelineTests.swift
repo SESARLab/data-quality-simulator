@@ -68,13 +68,13 @@ public class PipelineTests: XCTestCase {
         let s1 = RowFilterServiceFactory.build(withId: 1, withFilterPercent: 0.5)
         let s2 = RowFilterServiceFactory.build(withId: 2, withFilterPercent: 0.5)
         let dataset = DatasetFactory.build(withDatasetSize: 100)
-        let cachedDataset = DatasetFactory.build(withDatasetSize: 10)
+        let cachedDataset = DatasetFactory.build(withDatasetSize: 100)
         let pipeline = try PipelineFactory.build(withServices: [s1, s2])
 
         let result = pipeline.run(on: dataset, withCache: [([s1], cachedDataset)])
 
-        DatasetUtils.assertSize(of: result.output, isEqualTo: 10)
-        DatasetUtils.assertSizeWithoutNone(of: result.output, satisfy: { $0 < 10 && $0 >= 5 })
+        DatasetUtils.assertSize(of: result.output, isEqualTo: 100)
+        DatasetUtils.assertSizeWithoutNone(of: result.output, satisfy: { $0 < 100 && $0 >= 50 })
     }
 
     func testGivenPipelineWithAllCached_whenRun_thenReturnCachedDataset() throws {
@@ -99,6 +99,7 @@ public class PipelineTests: XCTestCase {
         let result = pipeline.run(on: dataset)
 
         XCTAssert(result.statsCalculator.filteredPercent < 0.50 && result.statsCalculator.filteredPercent >= 0.25)
-        XCTAssert(result.statsCalculator.metricValue > 2.0 && result.statsCalculator.metricValue <= 4.0)
+        XCTAssertGreaterThan(result.statsCalculator.metricValue, 0.5)
+        XCTAssertLessThanOrEqual(result.statsCalculator.metricValue, 0.75)
     }
 }

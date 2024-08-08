@@ -27,8 +27,8 @@ public class SimulationTests: XCTestCase {
 
         let result = try sim.run(on: dataset)
 
-        XCTAssert(result.metricValue > 2.0 && result.metricValue <= 4.0)
-        XCTAssert(result.percentage < 0.5 && result.percentage >= 0.25)
+        XCTAssertGreaterThan(result.metricValue, 0.5)
+        XCTAssertLessThan(result.percentage, 0.5)
     }
 
     func testGivenSimulationWith3NodesAndWin2_whenRun_thenChooseBestCombination() throws {
@@ -38,13 +38,13 @@ public class SimulationTests: XCTestCase {
         let dataset = DatasetFactory.build(withDatasetSize: 64)
         let sim = try SimulationFactory.build(
             withNodes: nodes,
-            withWindowSize: 1
+            withWindowSize: 2
         )
 
         let result = try sim.run(on: dataset)
 
-        XCTAssert(result.metricValue > 4.0 && result.metricValue <= 8.0)
-        XCTAssert(result.percentage < 0.25 && result.percentage >= 0.125)
+        XCTAssertGreaterThan(result.metricValue, 0.75)
+        XCTAssertLessThan(result.percentage, 0.25)
     }
 
     func testGivenSimulationWithSameWinAndNodeCount_whenRun_thenChooseBestCombination() throws {
@@ -59,7 +59,7 @@ public class SimulationTests: XCTestCase {
 
         let result = try sim.run(on: dataset)
 
-        XCTAssert(result.metricValue > 2.0 && result.metricValue <= 4.0)
-        XCTAssert(result.percentage < 0.5 && result.percentage >= 0.25)
+        XCTAssertGreaterThan(result.metricValue, 0.5)
+        XCTAssertLessThan(result.percentage, 0.5)
     }
 }

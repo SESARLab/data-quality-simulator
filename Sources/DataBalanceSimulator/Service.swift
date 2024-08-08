@@ -18,6 +18,8 @@ class BaseService: Equatable, CustomStringConvertible {
 
     let logger: Logger
 
+    var categoricalDatasetsMap: [String: PythonObject] = [:]
+
     init(id: Int,
         experimentSeed: Int,
         rowLowerBound: Double,
@@ -45,6 +47,26 @@ class BaseService: Equatable, CustomStringConvertible {
         let servicesLineageSeed = context.accumulatedFilteringSeed + self.filteringSeed
 
         return generatePercent(usingHashFrom: servicesLineageSeed)
+    }
+
+    fileprivate func getCategoricalDf(on dataframe: PythonObject, withContext context: Context) -> PythonObject {
+        let categoricalDataset: PythonObject
+        let originalDataframeId = PythonModulesStore.getPythonId(obj: context.originalDataset)
+        if self.categoricalDatasetsMap.keys.contains(originalDataframeId) {
+            categoricalDataset = self.categoricalDatasetsMap[originalDataframeId]!
+        }
+        else {
+            logger.debug("Service \(self.id) is building the Categorical DataFrame with id = \(originalDataframeId)...")
+
+            let samplingModule = PythonModulesStore.sampling
+            let createCategoricalDfFn = PythonModulesStore.getAttr(obj: samplingModule, attr: "create_categorical_df")
+            categoricalDataset = createCategoricalDfFn(df: context.originalDataset, random_state: self.serviceSeed)
+            self.categoricalDatasetsMap[originalDataframeId] = categoricalDataset
+
+            logger.debug("Service \(self.id) has built the Categorical DataFrame with id = \(originalDataframeId) ✅")
+        }
+
+        return categoricalDataset
     }
 
     private func generatePercent(usingHashFrom x: [UInt8]) -> Double {
@@ -107,8 +129,11 @@ class RowFilterService: BaseService {
         withContext context: Context, 
         inPlace: Bool = false
     ) -> PythonObject {
+        let categoricalDataset = getCategoricalDf(on: dataframe, withContext: context)
+
         return PythonModulesStore.sampling.sample_rows(
             df: dataframe,
+            df_with_categories: categoricalDataset,
             frac: self.finalFilteringPercent(from: context),
             random_state: self.serviceSeed,
             in_place: inPlace
@@ -118,8 +143,6 @@ class RowFilterService: BaseService {
 
 class ColumnFilterService: BaseService {
     var columnFrac: Double?
-
-    var categoricalDatasetsMap: [String: PythonObject] = [:]
 
     init(id: Int,
         experimentSeed: Int,
@@ -151,21 +174,7 @@ class ColumnFilterService: BaseService {
         withContext context: Context, 
         inPlace: Bool = false
     ) -> PythonObject {
-        let categoricalDataset: PythonObject
-        let originalDataframeId = PythonModulesStore.getPythonId(obj: context.originalDataset)
-        if self.categoricalDatasetsMap.keys.contains(originalDataframeId) {
-            categoricalDataset = self.categoricalDatasetsMap[originalDataframeId]!
-        }
-        else {
-            logger.debug("Service \(self.id) is building the Categorical DataFrame with id = \(originalDataframeId)...")
-
-            let samplingModule = PythonModulesStore.sampling
-            let createCategoricalDfFn = PythonModulesStore.getAttr(obj: samplingModule, attr: "create_categorical_df")
-            categoricalDataset = createCategoricalDfFn(df: context.originalDataset, random_state: self.serviceSeed)
-            self.categoricalDatasetsMap[originalDataframeId] = categoricalDataset
-
-            logger.debug("Service \(self.id) has built the Categorical DataFrame with id = \(originalDataframeId) ✅")
-        }
+        let categoricalDataset = getCategoricalDf(on: dataframe, withContext: context)
 
         return PythonModulesStore.sampling.sample_columns(
             df: dataframe,
