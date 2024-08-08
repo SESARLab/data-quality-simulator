@@ -70,7 +70,7 @@ def low_variability_10k():
 def avocado():
     import pandas as pd
 
-    df = pd.read_csv('datasets/avocado.csv', index_col=[0])
+    df = pd.read_csv('datasets/avocado.csv', usecols=lambda x: x != 'Unnamed: 0')
 
     df['Date'] = df['Date'].astype('datetime64[ns]')
     df['type'] = df['type'].astype('category')

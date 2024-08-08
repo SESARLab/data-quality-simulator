@@ -64,6 +64,7 @@ Datasets are located in the `datasets` folder. The following table describes the
 | inmates_enriched_10k | 5.35 | 13.09 | 3.62 |
 | IBM_HR_Analytics_employee_attrition | 3.13 | 8.56 | 2.93 |
 | red_wine_quality | 5.61 | 2.01 | 1.42 |
+| avocado | 9.36 | 22.13 | 4.7 |
 
 To compute the entropy of each column:
 
