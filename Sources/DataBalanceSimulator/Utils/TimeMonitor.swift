@@ -1,7 +1,7 @@
 import Foundation
 
 class TimeMonitor {
-    private var doneSamplings: Int    
+    private var doneSamplings: Int
 
     let totalSamplings: Int
 
@@ -10,6 +10,10 @@ class TimeMonitor {
     private let minNodes: Int
     private let maxNodes: Int
     private let maxWindowSize: Int
+
+    private let calendar = Calendar.current
+    private let startTime: Date
+    private var estimatedFinishTime: Date 
 
     init(minServices: Int, maxServices: Int, minNodes: Int, maxNodes: Int, maxWindowSize: Int) {
         var total: Int = 0
@@ -30,17 +34,56 @@ class TimeMonitor {
 
         self.doneSamplings = 0
         self.totalSamplings = total
+
+        self.startTime = Date.now
+        self.estimatedFinishTime = startTime
     }
 
+    /// updates the current estimations and statistics about the simulation execution
+    /// - Parameters:
+    ///   - services: number of services
+    ///   - nodes: number of nodes
+    ///   - winSize: the window size
+    ///   - isLastWindow: True if the window is the last one, False otherwise
     func completeWindow(services: Int, nodes: Int, winSize: Int, isLastWindow: Bool) {
         self.doneSamplings += Int(pow(Double(services),Double(winSize))) + 
             (isLastWindow ? nodes : 0)
+
+        let executionTime = calendar.dateComponents(
+            [.second], 
+            from: self.startTime,
+            to: Date.now
+        )
+
+        let executionSeconds = executionTime.second!
+        let estimatedFinishSeconds = executionSeconds * self.totalSamplings / self.doneSamplings
+
+        self.estimatedFinishTime = self.startTime.addingTimeInterval(TimeInterval(estimatedFinishSeconds))
     }
 
     func getDoneSampling() -> Int {
         return self.doneSamplings
     }
+
+    /// expresses the time left in the format dd:hh:mm:ss
+    /// - Returns: a string in the described format
+    func getEstimatedTimeLeft() -> String {
+        let estimatedTimeLeft = calendar.dateComponents(
+            [.day, .hour, .minute, .second], 
+            from: Date.now,
+            to: self.estimatedFinishTime
+        )
+
+        let day = String(estimatedTimeLeft.day!)
+        let hour = String(format: "%02d", estimatedTimeLeft.hour!)
+        let minute = String(format: "%02d", estimatedTimeLeft.minute!)
+        let second = String(format: "%02d", estimatedTimeLeft.second!)
+
+        return "\(day):\(hour):\(minute):\(second)"
+    }
     
+    /// return the completion time percent
+    /// - Returns: the percent of done samplings over the total ones
     func getCompletionPercent() -> Int {
         return Int(round(Double(self.doneSamplings) / Double(self.totalSamplings) * 100))
     }

@@ -102,7 +102,7 @@ class Simulation {
                 services: nodes[0].count, nodes: nodes.count, winSize: windowSize, 
                 isLastWindow: index == windows.count - 1)
             self.logger.debug("Best combination for window \(window): \(bestServiceComb!.services)")
-            self.logger.info("Simulator status - samplings processed: \(self.timeMonitor.getDoneSampling()), completion percent: \(timeMonitor.getCompletionPercent())%")
+            self.logger.info("Simulator status - samplings processed: \(self.timeMonitor.getDoneSampling()), completion percent: \(timeMonitor.getCompletionPercent())%, estimated time left: \(timeMonitor.getEstimatedTimeLeft())")
         }
 
         return bestStats!
