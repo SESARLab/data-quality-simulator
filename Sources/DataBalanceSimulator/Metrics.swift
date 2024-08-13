@@ -28,19 +28,11 @@ struct StatsCalculator {
         self.metricName = metricName
         self.pipeline = pipeline
 
-        self.filteredPercent = Double(filteredDataset.dropna().shape[0])! / Double(originalDataset.dropna().shape[0])!
-        // TODO: the next commented section is the old way to compute the filteredPercent
-        // var accumulatedFilteringSeed: [UInt8] = []
-        // var previousServices: [SimpleService] = []
-        // self.filteredPercent = self.pipeline.services.reduce(1.0, { (result, current) -> Double in 
-        //     let newPercent = result * current.finalFilteringPercent(from: SimpleContext(
-        //         previouslyChosenServices: previousServices,
-        //         accumulatedFilteringSeed: accumulatedFilteringSeed))
-        //     previousServices.append(current)
-        //     accumulatedFilteringSeed += current.filteringSeed
-
-        //     return newPercent
-        // })
+        let getLeftPercentage = PythonModulesStore.getAttr(
+            obj: PythonModulesStore.metrics, 
+            attr: "non_none_percentage"
+        )
+        self.filteredPercent = Double(getLeftPercentage(df1: originalDataset, df2: filteredDataset))!
 
         let metricCalculator = PythonModulesStore.getAttr(
             obj: PythonModulesStore.metrics, 

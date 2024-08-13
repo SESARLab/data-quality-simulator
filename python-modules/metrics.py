@@ -47,8 +47,13 @@ def qualitative(df1, df2):
 
 
 def quantitative(df1, df2):
+    return 1 - non_none_percentage(df1, df2)
+
+
+def non_none_percentage(df1, df2) -> float:
+    # df1 is the original dataset
+    df1_non_none_cells = df1.count().sum()
     # df2 is the filtered dataset
     df2_non_none_cells = df2.count().sum()
-    total_cells = df2.shape[0] * df2.shape[1]
 
-    return 1 - df2_non_none_cells / total_cells
+    return df2_non_none_cells / df1_non_none_cells
