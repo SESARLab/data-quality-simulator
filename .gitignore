@@ -5,3 +5,4 @@ db/data/
 notebooks/.ipynb_checkpoints/
 notebooks/*.png
 notebooks/*.svg
+exec-logs/

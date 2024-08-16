@@ -74,10 +74,14 @@ class TimeMonitor {
             to: self.estimatedFinishTime
         )
 
-        let day = String(estimatedTimeLeft.day!)
-        let hour = String(format: "%02d", estimatedTimeLeft.hour!)
-        let minute = String(format: "%02d", estimatedTimeLeft.minute!)
-        let second = String(format: "%02d", estimatedTimeLeft.second!)
+        return self.convertTimeIntervalToString(interval: estimatedTimeLeft)
+    }
+
+    private func convertTimeIntervalToString(interval: DateComponents) -> String {
+        let day = String(interval.day!)
+        let hour = String(format: "%02d", interval.hour!)
+        let minute = String(format: "%02d", interval.minute!)
+        let second = String(format: "%02d", interval.second!)
 
         return "\(day):\(hour):\(minute):\(second)"
     }
@@ -86,5 +90,17 @@ class TimeMonitor {
     /// - Returns: the percent of done samplings over the total ones
     func getCompletionPercent() -> Int {
         return Int(round(Double(self.doneSamplings) / Double(self.totalSamplings) * 100))
+    }
+
+    /// returns the execution time starting from the moment TimeMonitor was initialized
+    /// - Returns: the execution time in the format `dd:hh:mm:ss`
+    func getExecutionTime() -> String {
+        let executionTime = calendar.dateComponents(
+            [.day, .hour, .minute, .second], 
+            from: self.startTime,
+            to: Date.now
+        )
+
+        return self.convertTimeIntervalToString(interval: executionTime)
     }
 }

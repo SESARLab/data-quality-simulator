@@ -190,6 +190,8 @@ struct SimulatorCLI: ParsableCommand {
                 }
             }
         }
+
+        logger.info("Simulation completed successfully in \(timeMonitor.getExecutionTime()) ✅")
     }
 
     private func createService(
