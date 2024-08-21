@@ -50,7 +50,7 @@ public class ColumnFilterServiceTests: XCTestCase {
 
         DatasetUtils.assertSizeWithoutNone(of: dataset, isEqualTo: 100)
         DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 100)
-        DatasetUtils.assertSizeWithoutNone(of: filteredDataset, satisfy: { $0 < 100 })
+        DatasetUtils.assertSizeWithoutNone(of: filteredDataset, satisfy: { $0 <= 50 })
     }
 
     func testGivenRowFilterServiceAsSecond_whenRun_thenFilterDataset() throws {
@@ -68,7 +68,7 @@ public class ColumnFilterServiceTests: XCTestCase {
 
         DatasetUtils.assertSizeWithoutNone(of: dataset, isEqualTo: 100)
         DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 100)
-        DatasetUtils.assertSizeWithoutNone(of: filteredDataset, satisfy: { $0 < 100 })
+        DatasetUtils.assertSizeWithoutNone(of: filteredDataset, satisfy: { $0 <= 50 })
     }
 }
 
@@ -87,6 +87,6 @@ public class RowAndColumnFilterServiceTests: XCTestCase {
 
         DatasetUtils.assertSizeWithoutNone(of: dataset, isEqualTo: 100)
         DatasetUtils.assertSize(of: filteredDataset, isEqualTo: 100)
-        DatasetUtils.assertSizeWithoutNone(of: filteredDataset, satisfy: { $0 < 50 })
+        DatasetUtils.assertSizeWithoutNone(of: filteredDataset, satisfy: { $0 <= 50 })
     }
 }

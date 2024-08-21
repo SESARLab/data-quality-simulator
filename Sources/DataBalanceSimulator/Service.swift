@@ -194,8 +194,7 @@ class ColumnFilterService: BaseService {
 }
 
 class RowAndColumnFilterService: BaseService {
-    let rowFilterService: RowFilterService
-    let columnFilterService: ColumnFilterService
+    var columnFrac: Double?
 
     init(id: Int,
         experimentSeed: Int,
@@ -204,26 +203,17 @@ class RowAndColumnFilterService: BaseService {
         columnLowerBound: Double,
         columnUpperBound: Double
     ) {
-        self.rowFilterService = RowFilterService(id: id,
-            experimentSeed: experimentSeed, 
-            rowLowerBound: rowLowerBound, 
-            rowUpperBound: rowUpperBound
-        )
-        self.columnFilterService = ColumnFilterService(id: id,
-            experimentSeed: experimentSeed,
-            rowLowerBound: rowLowerBound, 
-            rowUpperBound: rowUpperBound,
-            columnLowerBound: columnLowerBound,
-            columnUpperBound: columnUpperBound
-        )
         super.init(id: id, 
             experimentSeed: experimentSeed, 
             rowLowerBound: rowLowerBound, 
             rowUpperBound: rowUpperBound
         )
+        self.columnFrac = Double.random(in: 0...1, using: &self.randomGenerator)
+            .normalize(min: 0, max: 1, from: columnLowerBound, to: columnUpperBound)
 
         logger.log(withDescription: "Creating RCF Service \(id)", withProps: [
-            "filteringSeed" : "\(filteringSeed)"
+            "filteringSeed" : "\(filteringSeed)",
+            "column_frac" : "\(self.columnFrac)"
         ])
     }
 
@@ -236,15 +226,23 @@ class RowAndColumnFilterService: BaseService {
         withContext context: Context, 
         inPlace: Bool = false
     ) -> PythonObject {
-        let modifiedDf =  self.rowFilterService.run(
-            on: dataframe, 
-            withContext: context, 
-            inPlace: inPlace
+        let categoricalDataset = getCategoricalDf(on: dataframe, withContext: context)
+
+        let modifiedDf = PythonModulesStore.sampling.sample_rows(
+            df: dataframe,
+            df_with_categories: categoricalDataset,
+            frac: self.finalFilteringPercent(from: context),
+            random_state: self.serviceSeed,
+            in_place: inPlace
         )
-        return self.columnFilterService.run(
-            on: modifiedDf,
-            withContext: context,
-            inPlace: true
+
+        return PythonModulesStore.sampling.sample_columns(
+            df: modifiedDf,
+            df_with_categories: categoricalDataset,
+            columns_frac: self.columnFrac,
+            cat_frac: self.finalFilteringPercent(from: context),
+            random_state: self.serviceSeed,
+            in_place: true
         )
     }
 
