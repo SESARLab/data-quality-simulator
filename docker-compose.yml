@@ -102,5 +102,5 @@ services:
       [
         "sh",
         "-c",
-        "echo \"${SQL_CODE}\" | sqlite3 simulations.db"
+        "echo \"${SQL_CODE}\" | sqlite3 remote-simulations.db"
       ]

@@ -2,7 +2,7 @@
 test_files/
 __pycache__/
 db/data/
-notebooks/.ipynb_checkpoints/
-notebooks/*.png
-notebooks/*.svg
+notebooks/
+!notebooks/aggregate.ipynb
 exec-logs/
+copy-remote-db.sh
