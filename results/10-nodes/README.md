@@ -13,4 +13,5 @@
 | Filtering Type | mixed |
 | Metric name | qualitative |
 | Dataset | inmates_enriched_10k |
+| Description | |
 

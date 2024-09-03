@@ -1,0 +1,122 @@
+{
+    "Pandas(row_lower_bound=0.2, row_upper_bound=1.0, column_lower_bound=0.6, column_upper_bound=0.9)": {
+        "metric_value": {}
+    },
+    "Pandas(row_lower_bound=0.2, row_upper_bound=1.0, column_lower_bound=0.8, column_upper_bound=0.8)": {
+        "metric_value": {}
+    },
+    "Pandas(row_lower_bound=0.2, row_upper_bound=0.2, column_lower_bound=0.2, column_upper_bound=0.2)": {
+        "metric_value": {
+            "1": 0.8325341556149709,
+            "2": 0.8325162918436257,
+            "3": 0.8325074844461009,
+            "4": 0.832489395640766,
+            "5": 0.8324613580279362,
+            "6": 0.8324479529358746,
+            "7": 0.8324464614115381
+        }
+    },
+    "Pandas(row_lower_bound=0.2, row_upper_bound=0.2, column_lower_bound=0.5, column_upper_bound=0.5)": {
+        "metric_value": {
+            "1": 0.8320624550217804,
+            "2": 0.8320397365446102,
+            "3": 0.8319432770599452,
+            "4": 0.8318225253302156,
+            "5": 0.8317409673379131,
+            "6": 0.8317123742342727,
+            "7": 0.8316783164724008
+        }
+    },
+    "Pandas(row_lower_bound=0.8, row_upper_bound=0.8, column_lower_bound=0.2, column_upper_bound=0.2)": {
+        "metric_value": {
+            "1": 0.74110223945972,
+            "2": 0.7409016587744188,
+            "3": 0.7401580102703849,
+            "4": 0.7396874994815649,
+            "5": 0.7396421706698406,
+            "6": 0.7394825324486042,
+            "7": 0.7394825324486042
+        }
+    },
+    "Pandas(row_lower_bound=0.5, row_upper_bound=0.5, column_lower_bound=0.8, column_upper_bound=0.8)": {
+        "metric_value": {
+            "1": 0.7793162871280519,
+            "2": 0.7793675533150545,
+            "3": 0.7786244929453836,
+            "4": 0.7774945104830683,
+            "5": 0.7762017137551149,
+            "6": 0.7761241831418901,
+            "7": 0.7758972536324971
+        }
+    },
+    "Pandas(row_lower_bound=0.5, row_upper_bound=0.5, column_lower_bound=0.5, column_upper_bound=0.5)": {
+        "metric_value": {
+            "1": 0.8175871092334811,
+            "2": 0.8169426657315221,
+            "3": 0.8163417839592328,
+            "4": 0.8156987992140106,
+            "5": 0.8154481962313144,
+            "6": 0.8152096320809801,
+            "7": 0.8150824353529394
+        }
+    },
+    "Pandas(row_lower_bound=0.5, row_upper_bound=0.5, column_lower_bound=0.2, column_upper_bound=0.2)": {
+        "metric_value": {
+            "1": 0.8288341574562212,
+            "2": 0.8288385273673535,
+            "3": 0.8287817802224936,
+            "4": 0.8286157525747673,
+            "5": 0.8285390508087438,
+            "6": 0.828488252767966,
+            "7": 0.8283937731416529
+        }
+    },
+    "Pandas(row_lower_bound=0.8, row_upper_bound=0.8, column_lower_bound=0.8, column_upper_bound=0.8)": {
+        "metric_value": {
+            "1": 0.5699857156686259,
+            "2": 0.5697925891833872,
+            "3": 0.5690002720559338,
+            "4": 0.568157281463586,
+            "5": 0.5654358409349733,
+            "6": 0.5652988844808913,
+            "7": 0.5652119175343234
+        }
+    },
+    "Pandas(row_lower_bound=0.8, row_upper_bound=0.8, column_lower_bound=0.5, column_upper_bound=0.5)": {
+        "metric_value": {
+            "1": 0.674559980326371,
+            "2": 0.6741584589914189,
+            "3": 0.6737499017453201,
+            "4": 0.6732899950246158,
+            "5": 0.6732589520376737,
+            "6": 0.6727392549947749,
+            "7": 0.672603993099939
+        }
+    },
+    "Pandas(row_lower_bound=0.2, row_upper_bound=0.2, column_lower_bound=0.8, column_upper_bound=0.8)": {
+        "metric_value": {
+            "1": 0.82884413439977,
+            "2": 0.8283079439626915,
+            "3": 0.8282152696964667,
+            "4": 0.8285542344822788,
+            "5": 0.8278957768228411,
+            "6": 0.8278958271237353,
+            "7": 0.8277803591295536
+        }
+    },
+    "Pandas(row_lower_bound=0.2, row_upper_bound=0.5, column_lower_bound=0.2, column_upper_bound=0.5)": {
+        "metric_value": {}
+    },
+    "Pandas(row_lower_bound=0.6, row_upper_bound=1.0, column_lower_bound=0.2, column_upper_bound=0.5)": {
+        "metric_value": {}
+    },
+    "Pandas(row_lower_bound=0.2, row_upper_bound=0.5, column_lower_bound=0.6, column_upper_bound=1.0)": {
+        "metric_value": {}
+    },
+    "Pandas(row_lower_bound=0.6, row_upper_bound=1.0, column_lower_bound=0.6, column_upper_bound=1.0)": {
+        "metric_value": {}
+    },
+    "Pandas(row_lower_bound=0.2, row_upper_bound=0.6, column_lower_bound=0.8, column_upper_bound=0.8)": {
+        "metric_value": {}
+    }
+}
