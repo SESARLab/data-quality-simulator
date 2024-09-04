@@ -4,7 +4,7 @@
 
 | Parameter | Value |
 | --------- | :---: |
-| Node count | 5 |
+| Node count | 6 |
 | Service count | 2-10 |
 | Row lower bound | 0.2 |
 | Row upper bound | 1 |
