@@ -61,22 +61,18 @@ def quantitative(df1, df2):
 
 
 def _get_column_entropy(column) -> float:
-    # necessary to avoid 0-rounded elements
-    prob_offset = 1e-10
-    column_probability = column.value_counts(normalize=True, dropna=True)
-    return -sum(column_probability * np.log2(column_probability + prob_offset))
+    column_probability = column.value_counts(normalize=True, dropna=False)
+    column_probability = column_probability[column_probability > 0]
+    return -sum(column_probability * np.log2(column_probability))
 
 
 def _get_dataset_entropy(dataset) -> float:
-    entropies = [_get_column_entropy(dataset[column]) for column in dataset.columns ]
+    entropies = [_get_column_entropy(dataset[column]) for column in dataset.columns]
     return np.mean(entropies)
 
 
-def entropy(df1, df2):
+def entropy_diff(df1, df2):
     original_entropy = _get_dataset_entropy(df1)
     new_entropy = _get_dataset_entropy(df2)
 
     return abs(original_entropy - new_entropy)
-
-
-
