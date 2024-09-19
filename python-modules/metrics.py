@@ -76,3 +76,13 @@ def entropy_diff(df1, df2):
     new_entropy = _get_dataset_entropy(df2)
 
     return abs(original_entropy - new_entropy)
+
+
+def entropy_ratio(df1, df2):
+    original_entropy = _get_dataset_entropy(df1)
+    new_entropy = _get_dataset_entropy(df2)
+
+    if new_entropy > original_entropy:
+        print('!!!!!!!!!!!! new entropy > original entropy !!!!!!!!!!!!')
+
+    return 1 - new_entropy / original_entropy 
