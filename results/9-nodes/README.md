@@ -4,7 +4,7 @@
 
 | Parameter | Value |
 | --------- | :---: |
-| Node count | 10 |
+| Node count | 9 |
 | Service count | 5 |
 | Row lower bound | 0.2 |
 | Row upper bound | 1 |
@@ -13,5 +13,5 @@
 | Filtering Type | mixed |
 | Metric name | qualitative |
 | Dataset | inmates_enriched_10k |
-| Description | |
+| Description | column and row filtering based on categories |
 

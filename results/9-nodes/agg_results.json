@@ -1,0 +1,30 @@
+{
+    "Pandas(dataset='inmates_enriched_10k')": {
+        "metric_value": {
+            "1": 0.6305479620994378,
+            "2": 0.5700499397202365,
+            "3": 0.5667373544207261,
+            "4": 0.5554228785791212,
+            "5": 0.5429861095550621,
+            "6": 0.5473285564913534,
+            "7": 0.5404006068350342,
+            "8": 0.5371779675649802,
+            "9": 0.5371779675649802
+        }
+    },
+    "Pandas(dataset='red_wine_quality')": {
+        "metric_value": {}
+    },
+    "Pandas(dataset='IBM_HR_Analytics_employee_attrition')": {
+        "metric_value": {}
+    },
+    "Pandas(dataset='avocado')": {
+        "metric_value": {}
+    },
+    "Pandas(dataset='high_variability_10k')": {
+        "metric_value": {}
+    },
+    "Pandas(dataset='low_variability_10k')": {
+        "metric_value": {}
+    }
+}
