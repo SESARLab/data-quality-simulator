@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS results (
     column_lower_bound double default 0.8,
     column_upper_bound double default 0.8,
     description text default '',
-    filtering_type text default 'mixed'
+    filtering_type text default 'mixed',
+    simulation_datetime DATETIME
 );
 
 -- migration 1: ALTER TABLE results ADD COLUMN description TEXT DEFAULT '';

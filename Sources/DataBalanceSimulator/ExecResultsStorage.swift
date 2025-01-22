@@ -5,6 +5,7 @@ import Logging
 class ExecResultsStorage {
     let db: Connection
     let logger: Logger
+    let simulationStartTime: Date
 
     static let table = Table("results")
     static let CONN_ERROR_MAX_RETRIES = 8
@@ -26,12 +27,14 @@ class ExecResultsStorage {
     static let columnUpperBound = Expression<Double>("column_upper_bound")
     static let description = Expression<String>("description")
     static let filteringType = Expression<String>("filtering_type")
+    static let simulationDatetime = Expression<Date>("simulation_datetime")
 
     init(dbPath: String) throws {
         self.logger = Logger.createWithLevelFromEnv(fileName: #file)
         logger.debug("Connecting to the database...")
         self.db = try Connection(dbPath)
         logger.debug("Connected to the database ✅")
+        self.simulationStartTime = Date()
     }
 
     public func insert(_ execResults: SimulatorCLI.ExecutionResults) throws {
@@ -56,7 +59,8 @@ class ExecResultsStorage {
                     ExecResultsStorage.columnLowerBound <- execResults.columnLowerBound,
                     ExecResultsStorage.columnUpperBound <- execResults.columnUpperBound,
                     ExecResultsStorage.description <- execResults.description,
-                    ExecResultsStorage.filteringType <- execResults.filteringType.rawValue
+                    ExecResultsStorage.filteringType <- execResults.filteringType.rawValue,
+                    ExecResultsStorage.simulationDatetime <- self.simulationStartTime
                 ))
                 logger.info("Insert of execution results successful ✅")
 
