@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - resources/simulation-job.yaml
+  - resources/database-pvc.yaml
+  - resources/datasets-pvc.yaml
+
+configMapGenerator:
+  - name: simulationparameters-configmap
+    options:
+      disableNameSuffixHash: true
+      labels:
+        app.kubernetes.io/name: jsonconfigs
+        app.kubernetes.io/part-of: data-quality-simulation
+        app.kubernetes.io/component: configuration
+    files:
+      - configs/base_config.json
+  - name: db-init-configmap
+    options:
+      disableNameSuffixHash: true
+      labels:
+        app.kubernetes.io/name: database-init
+        app.kubernetes.io/part-of: data-quality-simulation
+        app.kubernetes.io/component: configuration
+    files:
+      - configs/seed.sql

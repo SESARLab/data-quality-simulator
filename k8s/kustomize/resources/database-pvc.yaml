@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-quality-database-persistentvolumeclaim
+  labels:
+    app.kubernetes.io/name: sqlite
+    app.kubernetes.io/instance: sqlite
+    app.kubernetes.io/part-of: data-quality-simulation
+    app.kubernetes.io/component: database
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  volumeName: data-quality-database-persistentvolume
+  storageClassName: longhorn-rwx
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: data-quality-simulation
+      app.kubernetes.io/component: database
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: data-quality-database-persistentvolume
+  labels:
+    app.kubernetes.io/name: sqlite
+    app.kubernetes.io/instance: sqlite
+    app.kubernetes.io/part-of: data-quality-simulation
+    app.kubernetes.io/component: database
+spec:
+  capacity:
+    storage: 5Gi
+  storageClassName: longhorn-rwx
+  accessModes:
+    - ReadWriteMany
+  claimRef:
+    name: data-quality-database-persistentvolumeclaim

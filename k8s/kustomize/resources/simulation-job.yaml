@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: simulation-
+  labels:
+    app.kubernetes.io/name: simulation-job
+    app.kubernetes.io/part-of: data-quality-simulation
+    app.kubernetes.io/component: simulation
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      app.kubernetes.io/name: simulation-pod
+      app.kubernetes.io/part-of: data-quality-simulation
+      app.kubernetes.io/component: simulation
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+      initContainers:
+        - name: create-db-if-not-exists
+          image: keinos/sqlite3:3.48.0
+          working_dir: /db
+          volumeMounts:
+            - name: db-create-script-volume
+              mountPath: /initdb.d
+              readOnly: true
+            - name: db-data-volume
+              mountPath: /db
+          command:
+            ["sh", "-c", "cat /initdb.d/seed.sql | sqlite3 simulations.db"]
+      containers:
+        - name: simulator
+          image: bash:latest
+          # image: maluz/data-quality-simulator:1.0.0
+          command: ["sleep 3600"]
+          volumeMounts:
+            - name: db-data-volume
+              mountPath: /db
+            - name: datasets-volume
+              mountPath: /datasets
+      restartPolicy: Never
+      volumes:
+        - name: db-data-volume
+          persistentVolumeClaim:
+            claimName: data-quality-database-persistentvolumeclaim
+        - name: datasets-volume
+          persistentVolumeClaim:
+            claimName: data-quality-datasets-persistentvolumeclaim
+        - name: db-create-script-volume
+          configMap:
+            name: db-init-configmap
