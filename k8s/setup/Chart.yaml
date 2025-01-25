@@ -1,0 +1,4 @@
+apiVersion: v2
+name: setup
+description: Install the base resources required to run a simulation
+version: "1.0.0"

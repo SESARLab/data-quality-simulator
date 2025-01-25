@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-database-persistentvolumeclaim
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: sqlite
+    app.kubernetes.io/instance: sqlite
+    app.kubernetes.io/part-of: {{ .Release.Name }}
+    app.kubernetes.io/component: database
+spec:
+  resources:
+    requests:
+      storage: {{ .Values.database.storage }}
+  accessModes:
+    - ReadWriteMany
+  storageClassName: {{ .Values.database.storageClassname }}

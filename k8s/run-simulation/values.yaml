@@ -1,0 +1,4 @@
+databaseVolumeClaimName: setup-database-persistentvolumeclaim
+datasetsVolumeClaimName: setup-datasets-persistentvolumeclaim
+dbInitConfigMap: setup-db-init-configmap
+baseSimulationParamsConfigMap: setup-db-init-configmap

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-db-init-configmap
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: database-init
+    app.kubernetes.io/instance: database-init
+    app.kubernetes.io/part-of: {{ .Release.Name }}
+    app.kubernetes.io/component: configuration
+data:
+  seed.sql: |
+{{ .Files.Get "files/seed.sql" | indent 4 }}

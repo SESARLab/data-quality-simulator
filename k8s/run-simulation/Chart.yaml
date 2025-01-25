@@ -1,0 +1,4 @@
+apiVersion: v2
+name: run-simulation
+description: Execute a simulation as a K8s Job
+version: "1.0.0"

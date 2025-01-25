@@ -1,0 +1,7 @@
+database:
+  storageClassname: longhorn-rwx
+  storage: 5Gi
+
+datasets:
+  storageClassname: longhorn-rwx
+  storage: 50Gi

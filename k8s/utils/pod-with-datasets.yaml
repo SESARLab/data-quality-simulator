@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  generateName: datasets-utility-
+  labels:
+    isTemporary: "true"
+    purpose: datasetsCopy
+spec:
+  containers:
+    - name: temp-pod
+      image: bash:5.2.37
+      args: ["sleep", "inf"]
+      volumeMounts:
+        - name: datasets-volume
+          mountPath: /datasets
+  restartPolicy: Never
+  volumes:
+    - name: datasets-volume
+      persistentVolumeClaim:
+        claimName: setup-datasets-persistentvolumeclaim

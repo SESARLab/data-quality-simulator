@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-datasets-persistentvolumeclaim
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: datasets-folder
+    app.kubernetes.io/instance: datasets-folder
+    app.kubernetes.io/part-of: {{ .Release.Name }}
+    app.kubernetes.io/component: datasets
+spec:
+  resources:
+    requests:
+      storage: {{ .Values.datasets.storage }}
+  accessModes:
+    - ReadWriteMany
+  storageClassName: {{ .Values.datasets.storageClassname }}

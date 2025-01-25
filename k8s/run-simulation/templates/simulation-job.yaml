@@ -1,18 +1,13 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  generateName: simulation-
-  labels:
-    app.kubernetes.io/name: simulation-job
-    app.kubernetes.io/part-of: data-quality-simulation
-    app.kubernetes.io/component: simulation
+  generateName: {{ .Release.Name }}-simulation-job-
+{{ include "simulation.metadata" . | indent 2 }}
 spec:
   backoffLimit: 0
   template:
     metadata:
-      app.kubernetes.io/name: simulation-pod
-      app.kubernetes.io/part-of: data-quality-simulation
-      app.kubernetes.io/component: simulation
+{{ include "simulation.metadata" . | indent 6 }}
     spec:
       securityContext:
         runAsUser: 1000
@@ -20,9 +15,9 @@ spec:
       initContainers:
         - name: create-db-if-not-exists
           image: keinos/sqlite3:3.48.0
-          working_dir: /db
+          workingDir: /db
           volumeMounts:
-            - name: db-create-script-volume
+            - name: init-db-volume
               mountPath: /initdb.d
               readOnly: true
             - name: db-data-volume
@@ -33,20 +28,21 @@ spec:
         - name: simulator
           image: bash:latest
           # image: maluz/data-quality-simulator:1.0.0
-          command: ["sleep 3600"]
+          workingDir: /app
+          args: ["sleep", "3600"]
           volumeMounts:
             - name: db-data-volume
-              mountPath: /db
+              mountPath: /app/db
             - name: datasets-volume
-              mountPath: /datasets
+              mountPath: /app/datasets
       restartPolicy: Never
       volumes:
         - name: db-data-volume
           persistentVolumeClaim:
-            claimName: data-quality-database-persistentvolumeclaim
+            claimName: {{ .Values.databaseVolumeClaimName }}
         - name: datasets-volume
           persistentVolumeClaim:
-            claimName: data-quality-datasets-persistentvolumeclaim
-        - name: db-create-script-volume
+            claimName: {{ .Values.datasetsVolumeClaimName }}
+        - name: init-db-volume
           configMap:
-            name: db-init-configmap
+            name: {{ .Values.dbInitConfigMap }}
