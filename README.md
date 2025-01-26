@@ -108,4 +108,26 @@ To run queries on DB, run `make run-query SQL_CODE="your_plain_sql"`.
 
 ---
 
+## K8s
+
+Inside the `k8s/` folder, there are all the resources to run a simulation on k8s. After `cd k8s`, here are some Makefile recipees:
+
+- `install`: deploy the setup resources 
+- `uninstall`: uninstall the setup resources
+- `run-simulation`: run a simulation. Example:
+    ```bash
+    make run-simulation NAME=test-sim VALUES_FILE=./run-simulation/files/base-params.yaml`
+    ```
+- `delete-simulation`: uninstall the resources created for the simulation
+- `copy-dataset`: copy a dataset into the volume used by running a simulation. Example:
+    ```bash
+    make copy-dataset FILE_PATH=path/to/dataset.csv
+    ```
+- `query-db`: open a sqlite connection with the db specified (defaults to `simulations.db`). Example:
+    ```bash
+    make query-db DB_PATH=simulations.db
+    ```
+
+---
+
 [Deepnote experiments](https://deepnote.com/workspace/test-efaa-1feb6c70-6750-4e6b-8afd-854661b4e01a/project/Dataset-generation-17111468-e773-4c18-b5d3-b951c564e2bc/notebook/a0b70c155f2e4a4db16548fdf4ff4ddf)

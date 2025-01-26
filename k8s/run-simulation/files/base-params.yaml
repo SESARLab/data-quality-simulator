@@ -1,0 +1,17 @@
+loggerLevel: info
+simulationParams:
+  - "--seed=1"
+  - "--min-services=2"
+  - "--max-services=3"
+  - "--min-nodes=2"
+  - "--max-nodes=3"
+  - "--max-window-size=3"
+  - "--row-upper-bound=1"
+  - "--row-lower-bound=0.1"
+  - "--column-upper-bound=1"
+  - "--column-lower-bound=0.8"
+  - "--metric-name=qualitative"
+  - "--dataset-name=inmates_enriched_10k"
+  - "--db-path=./db/simulations.db"
+  - '--description="column and row filtering (assigning none to filtered)"'
+  - "--filtering-type=mixed"

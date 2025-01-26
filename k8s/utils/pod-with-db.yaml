@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  generateName: database-utility-
+  labels:
+    isTemporary: "true"
+    purpose: databaseMount
+spec:
+  containers:
+    - name: temp-pod
+      image: keinos/sqlite3:3.48.0
+      workingDir: /db
+      args: ["sleep", "infinity"]
+      volumeMounts:
+        - name: database-volume
+          mountPath: /db
+          readOnly: true
+  restartPolicy: Never
+  volumes:
+    - name: database-volume
+      persistentVolumeClaim:
+        claimName: setup-database-persistentvolumeclaim

@@ -26,10 +26,15 @@ spec:
             ["sh", "-c", "cat /initdb.d/seed.sql | sqlite3 simulations.db"]
       containers:
         - name: simulator
-          image: bash:latest
-          # image: maluz/data-quality-simulator:1.0.0
+          image: maluz/data-quality-simulator:1.0.0
           workingDir: /app
-          args: ["sleep", "3600"]
+          args:
+            {{- range .Values.simulationParams }}
+            - {{ . | quote }}
+            {{- end }}
+          env:
+            - name: LOGGER_LEVEL
+              value: {{ .Values.loggerLevel }}
           volumeMounts:
             - name: db-data-volume
               mountPath: /app/db
