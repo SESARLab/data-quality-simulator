@@ -49,8 +49,9 @@ services:
     ports:
       - 8889:8888
     volumes:
-      - ./notebooks:/home/jovyan/work
+      - ./notebooks:/home/jovyan/code
       - ./db/data:/home/jovyan/db:ro
+      - ./results:/home/jovyan/results:ro
     command: start-notebook.py --NotebookApp.token='my-token'
 
   get-results:
